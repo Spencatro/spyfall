@@ -145,8 +145,12 @@ class SpyfallApp(Flask):
         return self.allow_cross(jsonify({'players':player_list}))
 
     def list_games(self):
-        db_file = self.load_db_file()
-        return self.allow_cross(jsonify({'games':db_file['games'].keys()}))
+        game_obj_list = self.query_to_list(self.mongo.db.games.find())
+        game_list = []
+        for obj in game_obj_list:
+            game_name = obj['name']
+            game_list.append(game_name)
+        return self.allow_cross(jsonify({'games':game_list}))
 
     def get_game_state(self, game_name):
         state = self.mongo.db.games.find_one({'name':game_name})['state']

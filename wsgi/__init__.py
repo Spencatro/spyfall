@@ -48,6 +48,17 @@ class SpyfallApp(Flask):
 
     def list_games(self):
         db_file = self.load_db_file()
+        return jsonify({'games':db_file['games'].keys()})
+
+    def game_exists(self, game_name):
+        db_file = self.load_db_file()
+        games_list = db_file['games'].keys()
+        if game_name in games_list:
+            success = True
+        else:
+            success = False
+        return jsonify({'success':success})
+
 
 
 app = SpyfallApp(__name__)

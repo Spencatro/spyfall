@@ -101,8 +101,8 @@ class SpyfallApp(Flask):
             self.mongo.db.games.insert(self.new_game_object(game_name, player_name))
         else:
             result['already_existed'] = True
-        join_result = self.join_game(game_name, player_name)
-        if 'already_in_game' in join_result.keys():
+        join_result = self.join_game(game_name, player_name, no_http=True)
+        if 'already_in_game' in join_result[0].keys():
             result['already_in_game'] = True
         return self.allow_cross(jsonify(result))
 
@@ -118,12 +118,14 @@ class SpyfallApp(Flask):
     def game_exists(self, game_name):
         return self.allow_cross(jsonify({"result":self.mongo.db.games.find({'name':game_name}).count() > 0}))
 
-    def join_game(self, game_name, player_name):
+    def join_game(self, game_name, player_name, no_http=False):
         result = {'success':True, 'already_in_game':False}
         if not self.player_is_in_game(game_name, player_name):
             self.mongo.db.games.update({'name':game_name},{"$push":{'players':{'name':player_name, 'confirmed':False, 'role':"unassigned"}}})
         else:
             result['already_in_game'] = True
+        if no_http:
+            return result
         return self.allow_cross(jsonify(result))
 
     def remove_player_from_game(self, game_name, player_name):

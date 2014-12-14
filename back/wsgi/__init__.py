@@ -83,7 +83,7 @@ class SpyfallApp(Flask):
 
     def join_game(self, game_name, player_name):
         db_file = self.load_db_file()
-        db_file['games'][game_name]['players'][player_name] = {'role':None}
+        db_file['games'][game_name]['players'][player_name] = {'role':None, 'confirmed':False}
         self.overwrite_db(db_file)
         return self.allow_cross(jsonify({'success':True}))
 

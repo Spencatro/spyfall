@@ -25,8 +25,12 @@ class SpyfallApp(Flask):
         self.route("/remove_player_from_game/<game_name>/<player_name>/")(self.remove_player_from_game)
         self.route("/game_state/<game_name>/")(self.get_game_state)
         self.route("/player_role/<game_name>/<player_name>/")(self.get_player_role)
+        self.route("/mongo_test/")(self.mongo_test)
 
         self.mongo = None
+
+    def mongo_test(self):
+        self.mongo.db.maps
 
     def set_mongo(self, mongo):
         self.mongo = mongo

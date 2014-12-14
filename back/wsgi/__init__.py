@@ -25,11 +25,17 @@ class SpyfallApp(Flask):
         self.route("/remove_player_from_game/<game_name>/<player_name>/")(self.remove_player_from_game)
         self.route("/game_state/<game_name>/")(self.get_game_state)
         self.route("/player_role/<game_name>/<player_name>/")(self.get_player_role)
-        self.route("/maptest/")(self.maptest)
+
         self.mongo = None
 
-    def maptest(self):
-        return jsonify({'maplist':self.get_map_list()})
+    def query_to_list(self, query, remove_id = False):
+        result = []
+        for q in query:
+            if remove_id:
+                q.pop("_id")
+            result.append(q)
+        return result
+
 
     def get_map_list(self):
         mongo_result = self.mongo.db.maps.find()
@@ -48,11 +54,6 @@ class SpyfallApp(Flask):
 
     def allow_cross(self, return_value, code=200):
         return return_value, code, {'Access-Control-Allow-Origin': '*'}
-
-    def load_db_file(self):
-        with open(DB_JSON_FILE) as fp:
-            jsonificated = json.load(fp)
-        return jsonificated
 
     def overwrite_db(self, new_contents):
         with open(DB_JSON_FILE, 'w') as wfp:
@@ -81,7 +82,10 @@ class SpyfallApp(Flask):
         return str(eval(command))
 
     def dump_db(self):
-        return jsonify(self.load_db_file())
+        games_query = self.mongo.db.games.find()
+        maps_query = self.mongo.db.maps.find()
+
+        return jsonify({'maps':self.query_to_list(games_query)})
 
     def new_game(self, game_name, player_name):
         db = self.load_db_file()

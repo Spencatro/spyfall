@@ -3,7 +3,7 @@ import random
 from flask import Flask, jsonify, request, redirect, url_for
 from flask import render_template, abort
 import urllib
-import pymongo
+from flask.ext.pymongo import PyMongo
 
 DB_JSON_FILE = r'/var/www/spyfall/back/db.json'
 
@@ -25,6 +25,11 @@ class SpyfallApp(Flask):
         self.route("/remove_player_from_game/<game_name>/<player_name>/")(self.remove_player_from_game)
         self.route("/game_state/<game_name>/")(self.get_game_state)
         self.route("/player_role/<game_name>/<player_name>/")(self.get_player_role)
+
+        self.mongo = None
+
+    def set_mongo(self, mongo):
+        self.mongo = mongo
 
     def has_no_empty_params(self, rule):
         defaults = rule.defaults if rule.defaults is not None else ()
@@ -160,6 +165,9 @@ class SpyfallApp(Flask):
         return self.allow_cross(jsonify({'success':True, 'r_int':random_player_index, 'r_name':random_player_name, 'len_p':len_players}))
 
 app = SpyfallApp(__name__)
+app.config['MONGO_PORT'] = 27021
+mongo = PyMongo(app)
+app.set_mongo(mongo)
 
 if __name__ == "__main__":
     app.run(debug = "True")

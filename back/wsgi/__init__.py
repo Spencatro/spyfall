@@ -23,6 +23,9 @@ class SpyfallApp(Flask):
         self.route("/game_exists/<game_name>")(self.game_exists)
         self.route("/list_games/")(self.list_games)
 
+    def allow_cross(self, return_value, code=200):
+        return return_value, code, {'Access-Control-Allow-Origin': '*'}
+
     def load_db_file(self):
         with open(DB_JSON_FILE) as fp:
             jsonificated = json.load(fp)
@@ -46,11 +49,11 @@ class SpyfallApp(Flask):
         db = self.load_db_file()
         db['games'][game_name] = {}
         self.overwrite_db(db)
-        return "Success: ",game_name
+        return self.allow_cross("Success: ",game_name)
 
     def list_games(self):
         db_file = self.load_db_file()
-        return jsonify({'games':db_file['games'].keys()}), 200, {'Access-Control-Allow-Origin': '*'}
+        return self.allow_cross(jsonify({'games':db_file['games'].keys()}))
 
     def game_exists(self, game_name):
         db_file = self.load_db_file()
@@ -59,7 +62,7 @@ class SpyfallApp(Flask):
             success = True
         else:
             success = False
-        return jsonify({'result':success})
+        return self.allow_cross(jsonify({'result':success}))
 
 app = SpyfallApp(__name__)
 

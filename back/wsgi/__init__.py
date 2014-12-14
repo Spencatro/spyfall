@@ -87,13 +87,16 @@ class SpyfallApp(Flask):
 
         return jsonify({'maps':self.get_map_list(), 'games':self.query_to_list(games_query)})
 
+    def new_game_object(self, game_name, player_name):
+        d = {}
+        d['name'] = game_name
+        d['players'] = {}
+        d['state'] = "adding"
+        d['map'] = None
+        return d
+
     def new_game(self, game_name, player_name):
-        db = self.load_db_file()
-        db['games'][game_name] = {}
-        db['games'][game_name]['players'] = {}
-        db['games'][game_name]['state'] = "adding"
-        db['games'][game_name]['map'] = None
-        self.overwrite_db(db)
+        self.mongo.db.games.insert(self.new_game_object(game_name, player_name))
         self.join_game(game_name, player_name)
         return self.allow_cross(jsonify({"game_created":game_name}))
 
@@ -104,9 +107,7 @@ class SpyfallApp(Flask):
         return "success"
 
     def join_game(self, game_name, player_name):
-        db_file = self.load_db_file()
-        db_file['games'][game_name]['players'][player_name] = {'role':None, 'confirmed':False}
-        self.overwrite_db(db_file)
+        self.mongo.db.games.update({'name':game_name},{"$push":{'players':player_name}})
         return self.allow_cross(jsonify({'success':True}))
 
     def remove_player_from_game(self, game_name, player_name):

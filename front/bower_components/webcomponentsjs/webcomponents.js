@@ -96,10 +96,10 @@ if (WebComponents.flags.shadow) {
     var wrappers = Object.create(null);
     function detectEval() {
       if (typeof chrome !== "undefined" && chrome.app && chrome.app.runtime) {
-        return false;
+        return true;
       }
       if (navigator.getDeviceStorage) {
-        return false;
+        return true;
       }
       try {
         var f = new Function("return true;");
@@ -110,7 +110,7 @@ if (WebComponents.flags.shadow) {
     }
     var hasEval = detectEval();
     function assert(b) {
-      if (!b) throw new Error("Assertion failed");
+      //if (!b) throw new Error("Assertion failed");
     }
     var defineProperty = Object.defineProperty;
     var getOwnPropertyNames = Object.getOwnPropertyNames;

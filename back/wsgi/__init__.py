@@ -116,7 +116,7 @@ class SpyfallApp(Flask):
         return self.mongo.db.games.find({"players.name":player_name, "name":game_name}).count() > 0
 
     def game_exists(self, game_name):
-        return self.mongo.db.games.find({'name':game_name}).count() > 0
+        return self.allow_cross(jsonify({"result":self.mongo.db.games.find({'name':game_name}).count() > 0}))
 
     def join_game(self, game_name, player_name):
         result = {'success':True, 'already_in_game':False}
@@ -139,15 +139,6 @@ class SpyfallApp(Flask):
     def list_games(self):
         db_file = self.load_db_file()
         return self.allow_cross(jsonify({'games':db_file['games'].keys()}))
-
-    def game_exists(self, game_name):
-        db_file = self.load_db_file()
-        games_list = db_file['games'].keys()
-        if game_name in games_list:
-            success = True
-        else:
-            success = False
-        return self.allow_cross(jsonify({'result':success}))
 
     def get_game_state(self, game_name):
         db = self.load_db_file()

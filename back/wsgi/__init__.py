@@ -90,7 +90,7 @@ class SpyfallApp(Flask):
     def new_game_object(self, game_name, player_name):
         d = {}
         d['name'] = game_name
-        d['players'] = {}
+        d['players'] = []
         d['state'] = "adding"
         d['map'] = None
         return d
@@ -107,7 +107,7 @@ class SpyfallApp(Flask):
         return "success"
 
     def join_game(self, game_name, player_name):
-        self.mongo.db.games.update({'name':game_name},{"$push":{'players':player_name}})
+        self.mongo.db.games.update({'name':game_name},{"$push":{'players':{'name':player_name, 'confirmed':False, 'role':"unassigned"}}})
         return self.allow_cross(jsonify({'success':True}))
 
     def remove_player_from_game(self, game_name, player_name):

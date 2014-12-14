@@ -28,6 +28,11 @@ class SpyfallApp(Flask):
         self.route("/remove_player_from_game/<game_name>/<player_name>/")(self.remove_player_from_game)
         self.route("/game_state/<game_name>/")(self.get_game_state)
 
+    def has_no_empty_params(self, rule):
+        defaults = rule.defaults if rule.defaults is not None else ()
+        arguments = rule.arguments if rule.arguments is not None else ()
+        return len(defaults) >= len(arguments)
+
     def allow_cross(self, return_value, code=200):
         return return_value, code, {'Access-Control-Allow-Origin': '*'}
 
@@ -42,7 +47,15 @@ class SpyfallApp(Flask):
         return "success"
 
     def index(self):
-        return "<h1>Spyfall backend</h1>"
+        links = []
+        for rule in self.url_map.iter_rules():
+        # Filter out rules we can't navigate to in a browser
+        # and rules that require parameters
+        if "GET" in rule.methods and self.has_no_empty_params(rule):
+            url = url_for(rule.endpoint)
+            links.append((url, rule.endpoint))
+        return jsonify({'map':links})
+
 
     def debug(self, command):
         return str(eval(command))

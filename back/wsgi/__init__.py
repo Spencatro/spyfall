@@ -24,6 +24,7 @@ class SpyfallApp(Flask):
         self.route("/list_games/")(self.list_games)
         self.route("/join_game/<game_name>/<player_name>/")(self.join_game)
         self.route("/list_players_in_game/<game_name>/")(self.list_players_in_game)
+        self.route("/remove_player_from_game/<game_name>/<player_name>")(self.remove_player_from_game)
 
     def allow_cross(self, return_value, code=200):
         return return_value, code, {'Access-Control-Allow-Origin': '*'}
@@ -58,6 +59,12 @@ class SpyfallApp(Flask):
         db_file = self.load_db_file()
         db_file['games'][game_name]['players'][player_name] = {'role':None}
         self.overwrite_db(db_file)
+        return self.allow_cross(jsonify({'success':True}))
+
+    def remove_player_from_game(self, game_name, player_name):
+        db = self.load_db_file()
+        del db['games'][game_name]['players'][player_name]
+        self.overwrite_db(db)
         return self.allow_cross(jsonify({'success':True}))
 
     def list_players_in_game(self, game_name):

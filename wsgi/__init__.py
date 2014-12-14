@@ -20,6 +20,8 @@ class SpyfallApp(Flask):
         self.route("/debug/<command>")(self.debug)
         self.route("/dump_db/")(self.dump_db)
         self.route("/new_game/<game_name>")(self.new_game)
+        self.route("/game_exists/<game_name>")(self.game_exists)
+        self.route("/list_games/")(self.list_games)
 
     def load_db_file(self):
         with open(DB_JSON_FILE) as fp:

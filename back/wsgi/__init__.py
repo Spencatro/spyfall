@@ -175,13 +175,12 @@ class SpyfallApp(Flask):
         player_list = self.list_players_in_game(game_name, no_http=True)
         player_index = player_list.index(player_name)
         self.mongo.db.games.update({"name":game_name}, {"$set":{"players."+str(player_index)+".confirmed":True}})
-        return "ok"
-        db['games'][game_name]['players'][player_name]['confirmed'] = True
-        players = db['games'][game_name]['players']
+        players = self.mongo.db.games.find_one({"name":game_name})['players']
         all_confirmed = True
-        for player_key in players.keys():
-            if players[player_key]['confirmed'] == False:
+        for player_obj in players:
+            if player_obj['confirmed'] == False:
                 all_confirmed = False
+        return "all confirmed: "+str(all_confirmed)
         random_player_index = None
         len_players = None
         random_player_name = None

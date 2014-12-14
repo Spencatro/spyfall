@@ -23,8 +23,8 @@
       thing = this;
       $.getJSON("http://spyfall-backend.spencer-hawkins.com/game_exists/"+this.gameroomNameValue, function(result) {
         if (result.result == true) {
-          poly.innerContent = "Game found!";
-        } else {
+          poly.innerContent = "Game found! Joining...";
+        } else if(result.passcode_error) {
           poly.innerContent = "Game not found... Try again?";
           poly.isDisabled = false;
         }

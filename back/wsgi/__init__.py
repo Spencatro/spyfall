@@ -48,8 +48,14 @@ class SpyfallApp(Flask):
     def new_game(self, game_name):
         db = self.load_db_file()
         db['games'][game_name] = {}
+        db['games'][game_name]['players'] = {}
         self.overwrite_db(db)
         return self.allow_cross("Success: ",game_name)
+
+    def join_game(self, game_name, player_name):
+        db_file = self.load_db_file()
+        db_file['games'][game_name]['players'][player_name] = {'role':None}
+        self.overwrite_db(db_file)
 
     def list_games(self):
         db_file = self.load_db_file()

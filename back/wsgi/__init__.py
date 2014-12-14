@@ -115,6 +115,12 @@ class SpyfallApp(Flask):
         state = db['games'][game_name]['state']
         return self.allow_cross(jsonify({'state':state}))
 
+    def confirm_player(self, game_name, player_name):
+        db = self.load_db_file()
+        db['games'][game_name]['players'][player_name]['confirmed'] = True
+        self.overwrite_db(db)
+        return self.allow_cross(jsonify({'success':True}))
+
 app = SpyfallApp(__name__)
 
 if __name__ == "__main__":

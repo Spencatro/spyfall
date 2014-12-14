@@ -3,6 +3,7 @@ import random
 from flask import Flask, jsonify, request, redirect, url_for
 from flask import render_template, abort
 import urllib
+import pymongo
 
 DB_JSON_FILE = r'/var/www/spyfall/back/db.json'
 

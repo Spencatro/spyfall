@@ -159,8 +159,11 @@ class SpyfallApp(Flask):
     def get_player_role(self, game_name, player_name):
         result = {}
         location = self.mongo.db.games.find_one({"name":game_name})['map']
-        role = self.mongo.db.games.find_one({"name":game_name})['players'][player_name]['role']
-        result['role'] = role
+        players = self.mongo.db.games.find_one({"players.name":player_name, "name":game_name})['players']
+        result['role'] = "Unknown"
+        for player_obj in players:
+            if player_name == player_obj['name']:
+                result['role'] = player_obj['role']
         result['location'] = "Unknown"
         if result['role'] != "Spy":
             result['location'] = location

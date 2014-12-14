@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+
+  <head>
+
+    <title>Spyfall</title>
+
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="bower_components/webcomponentsjs/webcomponents.js">
+    </script>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+    <link rel="import" href="bower_components/font-roboto/roboto.html">
+    <link rel="import" href="bower_components/core-header-panel/core-header-panel.html">
+    <link rel="import" href="bower_components/paper-ripple/paper-ripple.html">
+    <link rel="import" href="bower_components/core-toolbar/core-toolbar.html">
+    <link rel="import" href="bower_components/core-menu/core-menu.html">
+    <link rel="import" href="bower_components/core-pages/core-pages.html">
+    <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
+    <link rel="import" href="bower_components/paper-input/paper-input.html">
+    <link rel="import" href="bower_components/paper-item/paper-item.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="my_components/create-game-form.html">
+    <link rel="import" href="my_components/join-game-form.html">
+
+    <style>
+      html,body {
+        height: 100%;
+        margin: 0;
+        background-color: #E5E5E5;
+        font-family: 'RobotoDraft', sans-serif;
+      }
+      core-header-panel {
+        height: 100%;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      core-toolbar {
+        background: #03a9f4;
+        color: white;
+      }
+      core-menu {
+        margin: 10px;
+      }
+      #tabs {
+        width: 400px;
+        margin: 0;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        text-transform: uppercase;
+      }
+      #how-to-play {
+        margin: 10px;
+      }
+      .container {
+        width: 80%;
+        margin: 50px auto;
+      }
+      @media (min-width: 481px) {
+        #tabs {
+          width: 400px;
+        }
+        .container {
+          width: 400px;
+        }
+      }
+    </style>
+  </head>
+
+  <body unresolved>
+    <core-header-panel>
+      <core-toolbar>
+        <paper-tabs id="tabs" selected="0" self-end>
+          <paper-tab name="join-game">Join a game</paper-tab>
+          <paper-tab name="create-game">Create a game</paper-tab>
+          <paper-tab name="how-to-play">How to play</paper-tab>
+        </paper-tabs>
+      </core-toolbar>
+      <!-- main page content will go here -->
+      <core-pages flex>
+        <div name="join-game">
+          <core-menu>
+            <join-game-form></game-form>
+          </core-menu>
+        </div>
+        <div name="create-game">
+          <core-menu>
+            <create-game-form></game-form>
+          </core-menu>
+        </div>
+        <div name="how-to-play" id="how-to-play">
+          <h1>Rules to come!</h1>
+        </div>
+      </core-pages>
+    </core-header-panel>
+    <script>
+      var mySearching = true;
+      var tabs = document.querySelector('paper-tabs');
+      var pages = document.querySelector('core-pages');
+      var goButton = document.querySelector('#go-button');
+
+      tabs.addEventListener('core-select', function() {
+        pages.selected = tabs.selected;
+        console.log("Selected: " + tabs.selected);
+      });
+    </script>
+  </body>
+</html>

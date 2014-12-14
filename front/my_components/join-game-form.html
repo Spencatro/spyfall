@@ -1,0 +1,33 @@
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<polymer-element name="join-game-form">
+  <template>
+    <h1>
+        Join a game!
+    </h1>
+    <paper-input-decorator floatingLabel="True" label="Your name"><input value="{{nameValue}}" id="your-name" /></paper-input-decorator>
+    <paper-input-decorator floatingLabel="True" label="Gameroom name"><input value="{{gameroomNameValue}}" id="gameroom-name" /></paper-input-decorator>
+    <paper-input-decorator floatingLabel="True" label="Gameroom passcode (optional)"><input value="{{gameroomPasscodeValue}}" id="gameroom-passcode" /></paper-input-decorator>
+    <paper-button on-click="{{clicked}}" disabled?="{{isDisabled}}" id="go-button" raised>{{innerContent}}</paper-button>
+  </template>
+  <script>
+  Polymer({
+    innerContent:"Let's gooooo!",
+    isDisabled: false,
+    clicked: function(e) {
+      this.isDisabled = true;
+      this.innerContent = "Searching for your game...";
+      console.log(this.nameValue);
+      thing = this;
+      $.getJSON("http://sub.localhost/"+this.gameroomNameValue, function(result) {
+        console.log(result);
+      });
+      setTimeout(function() {
+        thing.innerContent = "Could not find your game! Try again?";
+        thing.isDisabled = false;
+      }, 1000);
+    }
+  });
+  </script>
+</polymer-element>

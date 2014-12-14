@@ -1,0 +1,22 @@
+{
+  "name": "spyfall",
+  "version": "0.0.0",
+  "authors": [
+    "Spencer Hawkins <hawkins.spencer@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "http://spencer-hawkins.com",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.5.2",
+    "paper-ripple": "Polymer/paper-ripple#~0.5.2",
+    "core-menu": "Polymer/core-menu#~0.5.2"
+  }
+}

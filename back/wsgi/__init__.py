@@ -12,7 +12,7 @@ class SpyfallApp(Flask):
         self.route("/")(self.index)
         self.route("/debug/<command>/")(self.debug)
         self.route("/dump_db/")(self.dump_db)
-        self.route("/new_game/<game_name>/")(self.new_game)
+        self.route("/new_game/<game_name>/<player_name>/")(self.new_game)
         self.route("/game_exists/<game_name>/")(self.game_exists)
         self.route("/list_games/")(self.list_games)
         self.route("/delete_all_games/super_secret_password/")(self.delete_all_games)
@@ -61,13 +61,14 @@ class SpyfallApp(Flask):
     def dump_db(self):
         return jsonify(self.load_db_file())
 
-    def new_game(self, game_name):
+    def new_game(self, game_name, player_name):
         db = self.load_db_file()
         db['games'][game_name] = {}
         db['games'][game_name]['players'] = {}
         db['games'][game_name]['state'] = "adding"
         db['games'][game_name]['map'] = None
         self.overwrite_db(db)
+        self.join_game(game_name, player_name)
         return self.allow_cross(jsonify({"game_created":game_name}))
 
     def delete_all_games(self):
@@ -109,9 +110,6 @@ class SpyfallApp(Flask):
         db = self.load_db_file()
         state = db['games'][game_name]['state']
         return self.allow_cross(jsonify({'state':state}))
-
-    def assign_roles(self):
-        pass
 
     def confirm_player(self, game_name, player_name):
         db = self.load_db_file()

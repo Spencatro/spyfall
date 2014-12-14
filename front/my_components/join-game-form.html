@@ -16,17 +16,19 @@
     innerContent:"Let's gooooo!",
     isDisabled: false,
     clicked: function(e) {
-      this.isDisabled = true;
-      this.innerContent = "Searching for your game...";
+      poly = this
+      poly.isDisabled = true;
+      poly.innerContent = "Searching for your game...";
       console.log(this.nameValue);
       thing = this;
       $.getJSON("http://spyfall-backend.spencer-hawkins.com/game_exists/"+this.gameroomNameValue, function(result) {
-        console.log(result.result);
+        if (result.result == true) {
+          poly.innerContent = "Game found!";
+        } else {
+          poly.innerContent = "Game not found... Try again?";
+          poly.isDisabled = false;
+        }
       });
-      setTimeout(function() {
-        thing.innerContent = "Could not find your game! Try again?";
-        thing.isDisabled = false;
-      }, 1000);
     }
   });
   </script>

@@ -10,7 +10,7 @@ import requests
 import time
 import threading
 
-DB_JSON_FILE = r'/var/www/spyfall/db.json'
+DB_JSON_FILE = r'/var/www/spyfall/back/db.json'
 
 class SpyfallApp(Flask):
 

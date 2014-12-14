@@ -20,7 +20,7 @@
       poly.isDisabled = true;
       poly.innerContent = "Searching for your game...";
       console.log(this.nameValue);
-      $.getJSON('http://spyfall-backend.spencer-hawkins.com/new_game/'+poly.gameroomNameValue,function(r){
+      $.getJSON('http://spyfall-backend.spencer-hawkins.com/new_game/'+poly.gameroomNameValue+'/'+poly.nameValue+'/',function(r){
         console.log(r);
       });
     }

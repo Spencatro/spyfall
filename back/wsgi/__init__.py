@@ -154,8 +154,10 @@ class SpyfallApp(Flask):
             game_list.append(game_name)
         return self.allow_cross(jsonify({'games':game_list}))
 
-    def get_game_state(self, game_name):
+    def get_game_state(self, game_name, no_http = False):
         state = self.mongo.db.games.find_one({'name':game_name})['state']
+        if no_http:
+            return state
         return self.allow_cross(jsonify({'state':state}))
 
     def get_player_role(self, game_name, player_name):
@@ -180,18 +182,16 @@ class SpyfallApp(Flask):
         for player_obj in players:
             if player_obj['confirmed'] == False:
                 all_confirmed = False
-        return "all confirmed: "+str(all_confirmed)
         random_player_index = None
         len_players = None
         random_player_name = None
-        if all_confirmed and db['games'][game_name]['state'] != "playing": # Skip process if game already playing
-            # TODO: Always re-rolling, fix this
+        if all_confirmed and self.get_game_state(game_name, no_http=True) != "playing": # Skip process if game already playing
             # Pick a random map
             maps = self.get_map_list()
             random_map_index = random.randint(0, len(maps)-1)
-            map = maps[random_map_index]
-            db['games'][game_name]['map'] = map
-            db['games'][game_name]['state'] = "playing"
+            game_map = maps[random_map_index]
+            self.mongo.db.games.update({"name":game_name}, {"$set":{"map":game_map, "state":"playing"}})
+            return "ok"
             # Pick a random spy
             players = db['games'][game_name]['players'].keys()
             len_players = len(players)

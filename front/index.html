@@ -133,6 +133,11 @@
 
       function playGame() {
         $("#confirm-button").html("Everyone confirmed! Starting game...");
+        $.getJSON("http://spyfall-backend.spencer-hawkins.com/player_role/"+gameroomName+"/"+playerName+"/", function(result) {
+          console.log(result);
+          $("#main-core-menu").html("<h1>Your role: "+result.role+"</h1><h1>Location: "+result.location+"</h1>");
+        });
+
       }
 
       function lobbyConfirmedHeartbeat() {

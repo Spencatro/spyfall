@@ -62,7 +62,7 @@ class SpyfallApp(Flask):
 
     def list_players_in_game(self, game_name):
         db = self.load_db_file()
-        return self.allow_cross(jsonify({'players':db['games'][game_name]['players']}))
+        return self.allow_cross(jsonify({'players':db['games'][game_name]['players'].keys()}))
 
     def list_games(self):
         db_file = self.load_db_file()

@@ -59,9 +59,7 @@ class SpyfallApp(Flask):
             success = True
         else:
             success = False
-        return jsonify({'success':success})
-
-
+        return jsonify({'result':success})
 
 app = SpyfallApp(__name__)
 

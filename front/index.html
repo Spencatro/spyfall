@@ -155,6 +155,7 @@
         }
 
         function lobbyHeartbeat() {
+          console.log("lhb");
           $.getJSON("http://spyfall-backend.spencer-hawkins.com/list_players_in_game/"+gameroomName+"/", function(result) {
             childs = $("#lobby-select").children();
             child_array = []
@@ -182,13 +183,19 @@
         }
 
         function confirmPage() {
+          console.log("in confirmPage")
           tabs.selected = "join-game";
           $("#create-game-tab").remove();
           $("#main-tab").html("Current game");
+          console.log("calling html");
           $("#main-core-menu").html("<h1>Players in lobby...</h1>");
+          console.log("called html");
           $("#main-core-menu").append("<core-select selectedattribute id='lobby-select'><paper-item>"+playerName+"</paper-item></core-select>");
+          console.log("called 1st append");
           $("#main-core-menu").append("<paper-button raised id='confirm-button'>Confirm, ready for game!</paper-button>");
+          console.log("called 2nd append");
           $("#confirm-button").click(function(e){
+
             confirmLobby();
           });
           confirmHeartbeatIntervalID = setInterval(lobbyHeartbeat, 1000);
@@ -196,6 +203,7 @@
 
         function handleJoin(button, gameroomName, playerName) {
           // Set button to disabled, add message why
+          console.log("handling join");
           button.attr('disabled',true);
           button.html("Searching for your game...");
           // Make requests
@@ -205,6 +213,7 @@
               $.getJSON("http://spyfall-backend.spencer-hawkins.com/join_game/"+gameroomName+"/"+playerName+"/",function(result) {
                 if (result.success == true) {
                   // go to confirm page
+                  console.log("Calling confirmPage");
                   confirmPage();
                 } else {
                   button.html("An error occurred! Try again?...");
@@ -249,6 +258,7 @@
               return;
             }
             if (buttonType == "join") {
+              console.log("calling handleJoin");
               handleJoin(button, gameroomName, playerName);
             } else if (buttonType == "create") {
               handleCreate(button, gameroomName, playerName);

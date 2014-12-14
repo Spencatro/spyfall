@@ -33,13 +33,9 @@ class SpyfallApp(Flask):
 
     def get_map_list(self):
         mongo_result = self.mongo.db.maps.find()
-        map_dict = {}
-        for map in mongo_result:
-            idx = map['idx']
-            map_dict[idx] = map['name']
         map_list = []
-        for map_key in map_dict.keys().sort():
-            map_list.append(map_dict[map_key])
+        for map in mongo_result:
+            map_list.append(map['name'])
         return map_list
 
     def set_mongo(self, mongo):

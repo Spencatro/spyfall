@@ -85,7 +85,7 @@ class SpyfallApp(Flask):
         games_query = self.mongo.db.games.find()
         maps_query = self.mongo.db.maps.find()
 
-        return jsonify({'maps':self.query_to_list(maps_query)})
+        return jsonify({'maps':self.get_map_list()})
 
     def new_game(self, game_name, player_name):
         db = self.load_db_file()

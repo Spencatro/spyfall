@@ -20,7 +20,7 @@
       this.innerContent = "Searching for your game...";
       console.log(this.nameValue);
       thing = this;
-      $.getJSON("http://sub.localhost/"+this.gameroomNameValue, function(result) {
+      $.getJSON("http://spyfall-backend.spencer-hawkins.com/game_exists/"+this.gameroomNameValue, function(result) {
         console.log(result);
       });
       setTimeout(function() {

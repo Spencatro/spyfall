@@ -122,11 +122,19 @@ class SpyfallApp(Flask):
             if players[player_key]['confirmed'] == False:
                 all_confirmed = False
         if all_confirmed and db['games'][game_name]['state'] != "playing": # Skip process if game already playing
+            # Pick a random map
             maps = db['maps']
-            random_index = random.randint(0, len(maps)-1)
-            map = maps[random_index]
+            random_map_index = random.randint(0, len(maps)-1)
+            map = maps[random_map_index]
             db['games'][game_name]['map'] = map
             db['games'][game_name]['state'] = "playing"
+            # Pick a random spy
+            players = db['games'][game_name]['players'].keys()
+            random_player_index = random.randint(0, len(players)-1)
+            random_player_name = players = db['games'][game_name]['players'].keys()[random_player_index]
+            for player_key in db['games'][game_name]['players'].keys():
+                if player_key == random_player_name:
+                    db['games'][game_name]['players'][player_key]['role'] = "Spy"
         self.overwrite_db(db)
         return self.allow_cross(jsonify({'success':True}))
 

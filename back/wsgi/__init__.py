@@ -131,7 +131,8 @@ class SpyfallApp(Flask):
             db['games'][game_name]['state'] = "playing"
             # Pick a random spy
             players = db['games'][game_name]['players'].keys()
-            random_player_index = random.randint(0, len(players)-1)
+            len_players = len(players)
+            random_player_index = random.randint(0, len_players-1)
             random_player_name = players = db['games'][game_name]['players'].keys()[random_player_index]
             for player_key in db['games'][game_name]['players'].keys():
                 if player_key == random_player_name:
@@ -139,7 +140,7 @@ class SpyfallApp(Flask):
                 else:
                     db['games'][game_name]['players'][player_key]['role'] = "Player"
         self.overwrite_db(db)
-        return self.allow_cross(jsonify({'success':True, 'r_int':random_player_index, 'r_name':random_player_name, 'len_p':len(players)}))
+        return self.allow_cross(jsonify({'success':True, 'r_int':random_player_index, 'r_name':random_player_name, 'len_p':len_players}))
 
 app = SpyfallApp(__name__)
 

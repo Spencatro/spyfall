@@ -47,14 +47,18 @@ class SpyfallApp(Flask):
         return "success"
 
     def index(self):
-        links = []
-        for rule in self.url_map.iter_rules():
-        # Filter out rules we can't navigate to in a browser
-        # and rules that require parameters
-            if "GET" in rule.methods:
-                url = url_for(rule.endpoint)
-                links.append((url, rule.endpoint))
-        return jsonify({'map':links})
+        import urllib
+        output = []
+        for rule in app.url_map.iter_rules():
+            options = {}
+            for arg in rule.arguments:
+                options[arg] = "[{0}]".format(arg)
+
+            methods = ','.join(rule.methods)
+            url = url_for(rule.endpoint, **options)
+            line = urllib.unquote("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
+            output.append(line)
+        return jsonify({'map':output})
 
 
     def debug(self, command):

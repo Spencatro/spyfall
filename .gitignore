@@ -1,2 +1,3 @@
-wsgi/venv/*
+back/wsgi/venv/*
 front/tut/*
+back/db.json

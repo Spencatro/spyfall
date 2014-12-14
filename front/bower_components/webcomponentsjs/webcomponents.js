@@ -105,7 +105,7 @@ if (WebComponents.flags.shadow) {
         var f = new Function("return true;");
         return f();
       } catch (ex) {
-        return false;
+        return true;
       }
     }
     var hasEval = detectEval();

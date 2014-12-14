@@ -188,8 +188,9 @@
           $("#create-game-tab").remove();
           $("#main-tab").html("Current game");
           console.log("calling html");
-          $("#main-core-menu").html("<h1>Players in lobby...</h1>");
+          $("#main-core-menu").html("");
           console.log("called html");
+          $("#main-core-menu").append("<h1>Players in lobby</h1>");
           $("#main-core-menu").append("<core-select selectedattribute id='lobby-select'><paper-item>"+playerName+"</paper-item></core-select>");
           console.log("called 1st append");
           $("#main-core-menu").append("<paper-button raised id='confirm-button'>Confirm, ready for game!</paper-button>");

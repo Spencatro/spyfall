@@ -24,6 +24,7 @@ class SpyfallApp(Flask):
         self.route("/list_games/")(self.list_games)
         self.route("/delete_all_games/super_secret_password/")(self.delete_all_games)
         self.route("/join_game/<game_name>/<player_name>/")(self.join_game)
+        self.route("/confirm_player/<game_name>/<player_name>/")(self.confirm_player)
         self.route("/list_players_in_game/<game_name>/")(self.list_players_in_game)
         self.route("/remove_player_from_game/<game_name>/<player_name>/")(self.remove_player_from_game)
         self.route("/game_state/<game_name>/")(self.get_game_state)

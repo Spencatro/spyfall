@@ -102,7 +102,7 @@ class SpyfallApp(Flask):
         else:
             result['already_existed'] = True
         join_result = self.join_game(game_name, player_name, no_http=True)
-        if 'already_in_game' in join_result[0].keys():
+        if 'already_in_game' in join_result.keys():
             result['already_in_game'] = True
         return self.allow_cross(jsonify(result))
 

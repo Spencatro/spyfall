@@ -22,7 +22,7 @@ class SpyfallApp(Flask):
         self.route("/new_game/<game_name>")(self.new_game)
         self.route("/game_exists/<game_name>")(self.game_exists)
         self.route("/list_games/")(self.list_games)
-        self.route("/join_game/")(self.join_game)
+        self.route("/join_game/<game_name>/<player_name>")(self.join_game)
 
     def allow_cross(self, return_value, code=200):
         return return_value, code, {'Access-Control-Allow-Origin': '*'}

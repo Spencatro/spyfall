@@ -118,144 +118,147 @@
       </core-pages>
     </core-header-panel>
     <script>
-      var joinDisabled = false;
-      var tabs = document.querySelector('paper-tabs');
-      var pages = document.querySelector('core-pages');
-      var goButton = document.querySelector('#go-button');
-      var playerName = null;
-      var gameroomName = null;
-      var confirmHeartbeatIntervalID = null;
+      $.ready(function() {
+        console.log("ready");
+        var joinDisabled = false;
+        var tabs = document.querySelector('paper-tabs');
+        var pages = document.querySelector('core-pages');
+        var goButton = document.querySelector('#go-button');
+        var playerName = null;
+        var gameroomName = null;
+        var confirmHeartbeatIntervalID = null;
 
-      tabs.addEventListener('core-select', function() {
-        pages.selected = tabs.selected;
-        console.log("Selected: " + tabs.selected);
-      });
-
-      function playGame() {
-        $("#confirm-button").html("Everyone confirmed! Starting game...");
-        $.getJSON("http://spyfall-backend.spencer-hawkins.com/player_role/"+gameroomName+"/"+playerName+"/", function(result) {
-          console.log(result);
-          $("#main-core-menu").html("<h1>Your role: "+result.role+"</h1><h1>Location: "+result.location+"</h1>");
+        tabs.addEventListener('core-select', function() {
+          pages.selected = tabs.selected;
+          console.log("Selected: " + tabs.selected);
         });
 
-      }
+        function playGame() {
+          $("#confirm-button").html("Everyone confirmed! Starting game...");
+          $.getJSON("http://spyfall-backend.spencer-hawkins.com/player_role/"+gameroomName+"/"+playerName+"/", function(result) {
+            console.log(result);
+            $("#main-core-menu").html("<h1>Your role: "+result.role+"</h1><h1>Location: "+result.location+"</h1>");
+          });
 
-      function lobbyConfirmedHeartbeat() {
-        console.log("doing post-confirm hb");
-        $.getJSON("http://spyfall-backend.spencer-hawkins.com/game_state/"+gameroomName+"/", function(result) {
-          console.log(result);
-          if (result.state == "playing") {
-            clearInterval(confirmHeartbeatIntervalID);
-            playGame();
-          }
-        });
-      }
+        }
 
-      function lobbyHeartbeat() {
-        $.getJSON("http://spyfall-backend.spencer-hawkins.com/list_players_in_game/"+gameroomName+"/", function(result) {
-          childs = $("#lobby-select").children();
-          child_array = []
-          for(var i = 0; i < childs.length; i++) {
-            child_array.push($(childs[i]).html());
-          }
-          if(!($(child_array).not(result.players).length == 0 && $(result.players).not(child_array).length == 0)) {
-            console.log("time to update the array");
-            $("#lobby-select").html(""); 
-            for(var i = 0; i < result.players.length; i++) {
-              $("#lobby-select").append("<paper-item>"+result.players[i]+"</paper-item>");
+        function lobbyConfirmedHeartbeat() {
+          console.log("doing post-confirm hb");
+          $.getJSON("http://spyfall-backend.spencer-hawkins.com/game_state/"+gameroomName+"/", function(result) {
+            console.log(result);
+            if (result.state == "playing") {
+              clearInterval(confirmHeartbeatIntervalID);
+              playGame();
             }
-          }
-        });
-      }
+          });
+        }
 
-      function confirmLobby() {
-        $.getJSON("http://spyfall-backend.spencer-hawkins.com/confirm_player/"+gameroomName+"/"+playerName+"/", function(result){
-          console.log(result);
-        });
-        clearInterval(confirmHeartbeatIntervalID);
-        $("#confirm-button").html("Confirmed! Waiting on others...");
-        $("#confirm-button").attr("disabled",true);
-        confirmHeartbeatIntervalID = setInterval(lobbyConfirmedHeartbeat, 1000);
-      }
-
-      function confirmPage() {
-        tabs.selected = "join-game";
-        $("#create-game-tab").remove();
-        $("#main-tab").html("Current game");
-        $("#main-core-menu").html("<h1>Players in lobby...</h1>");
-        $("#main-core-menu").append("<core-select selectedattribute id='lobby-select'><paper-item>"+playerName+"</paper-item></core-select>");
-        $("#main-core-menu").append("<paper-button raised id='confirm-button'>Confirm, ready for game!</paper-button>");
-        $("#confirm-button").click(function(e){
-          confirmLobby();
-        });
-        confirmHeartbeatIntervalID = setInterval(lobbyHeartbeat, 1000);
-      }
-
-      function handleJoin(button, gameroomName, playerName) {
-        // Set button to disabled, add message why
-        button.attr('disabled',true);
-        button.html("Searching for your game...");
-        // Make requests
-        $.getJSON("http://spyfall-backend.spencer-hawkins.com/game_exists/"+gameroomName+"/", function(result) {
-          if (result.result == true) {
-            button.html("Game found! Joining...");
-            $.getJSON("http://spyfall-backend.spencer-hawkins.com/join_game/"+gameroomName+"/"+playerName+"/",function(result) {
-              if (result.success == true) {
-                // go to confirm page
-                confirmPage();
-              } else {
-                button.html("An error occurred! Try again?...");
-                button.attr('disabled',false);
+        function lobbyHeartbeat() {
+          $.getJSON("http://spyfall-backend.spencer-hawkins.com/list_players_in_game/"+gameroomName+"/", function(result) {
+            childs = $("#lobby-select").children();
+            child_array = []
+            for(var i = 0; i < childs.length; i++) {
+              child_array.push($(childs[i]).html());
+            }
+            if(!($(child_array).not(result.players).length == 0 && $(result.players).not(child_array).length == 0)) {
+              console.log("time to update the array");
+              $("#lobby-select").html(""); 
+              for(var i = 0; i < result.players.length; i++) {
+                $("#lobby-select").append("<paper-item>"+result.players[i]+"</paper-item>");
               }
-            });
-          } else if(result) {
-            button.html("Game not found... Try again?");
-            button.attr('disabled', false);
-          }
-        });
-      }
+            }
+          });
+        }
 
-      function handleCreate(button, gameroomName, playerName) {
-        console.log("handling craete");
-        // Set button to disabled, add message why
-        button.attr('disabled',true);
-        button.html("Creating your game...");
-        // Make requests
-        $.getJSON("http://spyfall-backend.spencer-hawkins.com/new_game/"+gameroomName+"/"+playerName+"/", function(result) {
-          if (result.game_created == gameroomName) {
-            button.html("Game created! Joining...");
-            confirmPage();
-          } else {
-            button.html("An error occurred! Try again?");
-            button.attr('disabled',false);
-          }
-        });
-      }
+        function confirmLobby() {
+          $.getJSON("http://spyfall-backend.spencer-hawkins.com/confirm_player/"+gameroomName+"/"+playerName+"/", function(result){
+            console.log(result);
+          });
+          clearInterval(confirmHeartbeatIntervalID);
+          $("#confirm-button").html("Confirmed! Waiting on others...");
+          $("#confirm-button").attr("disabled",true);
+          confirmHeartbeatIntervalID = setInterval(lobbyConfirmedHeartbeat, 1000);
+        }
 
-      function addButtonClickHandlers(buttonType, button) {
-        console.log("Adding click handler for"+buttonType);
-        button.click(function(e){
-          if (button.attr('disabled')) { return; }
-          // Find data
-          playerName = $("#"+buttonType+"-your-name").val();
-          gameroomName = $("#"+buttonType+"-gameroom-name").val();
-          gameroomPasscode = $("#"+buttonType+"-gameroom-passcode").val();
-          // Test if all fields filled
-          if (playerName == "" || gameroomName == ""){
-            button.html("Fields not complete!");
-            return;
-          }
-          if (buttonType == "join") {
-            handleJoin(button, gameroomName, playerName);
-          } else if (buttonType == "create") {
-            handleCreate(button, gameroomName, playerName);
-          }
-        });
-      }
+        function confirmPage() {
+          tabs.selected = "join-game";
+          $("#create-game-tab").remove();
+          $("#main-tab").html("Current game");
+          $("#main-core-menu").html("<h1>Players in lobby...</h1>");
+          $("#main-core-menu").append("<core-select selectedattribute id='lobby-select'><paper-item>"+playerName+"</paper-item></core-select>");
+          $("#main-core-menu").append("<paper-button raised id='confirm-button'>Confirm, ready for game!</paper-button>");
+          $("#confirm-button").click(function(e){
+            confirmLobby();
+          });
+          confirmHeartbeatIntervalID = setInterval(lobbyHeartbeat, 1000);
+        }
 
-      addButtonClickHandlers("join", $('#join-go-button'));
-      addButtonClickHandlers("create", $('#create-go-button'));
-      console.log("End of script");
+        function handleJoin(button, gameroomName, playerName) {
+          // Set button to disabled, add message why
+          button.attr('disabled',true);
+          button.html("Searching for your game...");
+          // Make requests
+          $.getJSON("http://spyfall-backend.spencer-hawkins.com/game_exists/"+gameroomName+"/", function(result) {
+            if (result.result == true) {
+              button.html("Game found! Joining...");
+              $.getJSON("http://spyfall-backend.spencer-hawkins.com/join_game/"+gameroomName+"/"+playerName+"/",function(result) {
+                if (result.success == true) {
+                  // go to confirm page
+                  confirmPage();
+                } else {
+                  button.html("An error occurred! Try again?...");
+                  button.attr('disabled',false);
+                }
+              });
+            } else if(result) {
+              button.html("Game not found... Try again?");
+              button.attr('disabled', false);
+            }
+          });
+        }
+
+        function handleCreate(button, gameroomName, playerName) {
+          console.log("handling craete");
+          // Set button to disabled, add message why
+          button.attr('disabled',true);
+          button.html("Creating your game...");
+          // Make requests
+          $.getJSON("http://spyfall-backend.spencer-hawkins.com/new_game/"+gameroomName+"/"+playerName+"/", function(result) {
+            if (result.game_created == gameroomName) {
+              button.html("Game created! Joining...");
+              confirmPage();
+            } else {
+              button.html("An error occurred! Try again?");
+              button.attr('disabled',false);
+            }
+          });
+        }
+
+        function addButtonClickHandlers(buttonType, button) {
+          console.log("Adding click handler for"+buttonType);
+          button.click(function(e){
+            if (button.attr('disabled')) { return; }
+            // Find data
+            playerName = $("#"+buttonType+"-your-name").val();
+            gameroomName = $("#"+buttonType+"-gameroom-name").val();
+            gameroomPasscode = $("#"+buttonType+"-gameroom-passcode").val();
+            // Test if all fields filled
+            if (playerName == "" || gameroomName == ""){
+              button.html("Fields not complete!");
+              return;
+            }
+            if (buttonType == "join") {
+              handleJoin(button, gameroomName, playerName);
+            } else if (buttonType == "create") {
+              handleCreate(button, gameroomName, playerName);
+            }
+          });
+        }
+
+        addButtonClickHandlers("join", $('#join-go-button'));
+        addButtonClickHandlers("create", $('#create-go-button'));
+        console.log("End of script");
+    });
     </script>
   </body>
 </html>

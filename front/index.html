@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
 
@@ -17,13 +18,14 @@
     <link rel="import" href="bower_components/paper-ripple/paper-ripple.html">
     <link rel="import" href="bower_components/core-toolbar/core-toolbar.html">
     <link rel="import" href="bower_components/core-menu/core-menu.html">
+    <link rel="import" href="bower_components/core-item/core-item.html">
+    <link rel="import" href="bower_components/core-list/core-list.html">
+    <link rel="import" href="bower_components/core-selection/core-selection.html">
     <link rel="import" href="bower_components/core-pages/core-pages.html">
     <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
     <link rel="import" href="bower_components/paper-input/paper-input.html">
     <link rel="import" href="bower_components/paper-item/paper-item.html">
     <link rel="import" href="bower_components/paper-button/paper-button.html">
-    <link rel="import" href="my_components/create-game-form.html">
-    <link rel="import" href="my_components/join-game-form.html">
 
     <style>
       html,body {
@@ -43,6 +45,12 @@
       }
       core-menu {
         margin: 10px;
+      }
+      paper-item {
+        border-bottom: solid #ccc 1px;
+      }
+      paper-item:last-child {
+        border-bottom: none;
       }
       #tabs {
         width: 400px;
@@ -75,21 +83,33 @@
     <core-header-panel>
       <core-toolbar>
         <paper-tabs id="tabs" selected="0" self-end>
-          <paper-tab name="join-game">Join a game</paper-tab>
-          <paper-tab name="create-game">Create a game</paper-tab>
-          <paper-tab name="how-to-play">How to play</paper-tab>
+          <paper-tab name="join-game" id="main-tab">Join a game</paper-tab>
+          <paper-tab name="create-game" id="create-game-tab">Create a game</paper-tab>
+          <paper-tab name="how-to-play" id="how-to-play-tab">How to play</paper-tab>
         </paper-tabs>
       </core-toolbar>
       <!-- main page content will go here -->
       <core-pages flex>
-        <div name="join-game">
-          <core-menu>
-            <join-game-form></game-form>
+        <div name="join-game" id="main-page">
+          <core-menu id="main-core-menu">
+            <h1>
+              Join a game!
+            </h1>
+            <paper-input-decorator floatingLabel="True" label="Your name"><input id="join-your-name" /></paper-input-decorator>
+            <paper-input-decorator floatingLabel="True" label="Gameroom name"><input id="join-gameroom-name" /></paper-input-decorator>
+            <paper-input-decorator floatingLabel="True" label="Gameroom passcode (optional)"><input id="join-gameroom-passcode" /></paper-input-decorator>
+            <paper-button id="join-go-button" raised>Let's gooooo!</paper-button>
           </core-menu>
         </div>
-        <div name="create-game">
+        <div name="create-game" id="create-game">
           <core-menu>
-            <create-game-form></game-form>
+            <h1>
+              Create a game!
+            </h1>
+            <paper-input-decorator floatingLabel="True" label="Your name"><input id="create-your-name" /></paper-input-decorator>
+            <paper-input-decorator floatingLabel="True" label="Gameroom name"><input id="create-gameroom-name" /></paper-input-decorator>
+            <paper-input-decorator floatingLabel="True" label="Gameroom passcode (optional)"><input id="create-gameroom-passcode" /></paper-input-decorator>
+            <paper-button id="create-go-button" raised>Let's gooooo!</paper-button>
           </core-menu>
         </div>
         <div name="how-to-play" id="how-to-play">
@@ -98,15 +118,137 @@
       </core-pages>
     </core-header-panel>
     <script>
-      var mySearching = true;
+      var joinDisabled = false;
       var tabs = document.querySelector('paper-tabs');
       var pages = document.querySelector('core-pages');
       var goButton = document.querySelector('#go-button');
+      var playerName = null;
+      var gameroomName = null;
+      var confirmHeartbeatIntervalID = null;
 
       tabs.addEventListener('core-select', function() {
         pages.selected = tabs.selected;
         console.log("Selected: " + tabs.selected);
       });
+
+      function playGame() {
+        $("#confirm-button").html("Everyone confirmed! Starting game...");
+      }
+
+      function lobbyConfirmedHeartbeat() {
+        console.log("doing post-confirm hb");
+        $.getJSON("http://spyfall-backend.spencer-hawkins.com/game_state/"+gameroomName+"/", function(result) {
+          console.log(result);
+          if (result.state == "playing") {
+            clearInterval(confirmHeartbeatIntervalID);
+            playGame();
+          }
+        });
+      }
+
+      function lobbyHeartbeat() {
+        $.getJSON("http://spyfall-backend.spencer-hawkins.com/list_players_in_game/"+gameroomName+"/", function(result) {
+          childs = $("#lobby-select").children();
+          child_array = []
+          for(var i = 0; i < childs.length; i++) {
+            child_array.push($(childs[i]).html());
+          }
+          if(!($(child_array).not(result.players).length == 0 && $(result.players).not(child_array).length == 0)) {
+            console.log("time to update the array");
+            $("#lobby-select").html(""); 
+            for(var i = 0; i < result.players.length; i++) {
+              $("#lobby-select").append("<paper-item>"+result.players[i]+"</paper-item>");
+            }
+          }
+        });
+      }
+
+      function confirmLobby() {
+        $.getJSON("http://spyfall-backend.spencer-hawkins.com/confirm_player/"+gameroomName+"/"+playerName+"/", function(result){
+          console.log(result);
+        });
+        clearInterval(confirmHeartbeatIntervalID);
+        $("#confirm-button").html("Confirmed! Waiting on others...");
+        $("#confirm-button").attr("disabled",true);
+        confirmHeartbeatIntervalID = setInterval(lobbyConfirmedHeartbeat, 1000);
+      }
+
+      function confirmPage() {
+        tabs.selected = "join-game";
+        $("#create-game-tab").remove();
+        $("#main-tab").html("Current game");
+        $("#main-core-menu").html("<h1>Players in lobby...</h1>");
+        $("#main-core-menu").append("<core-select selectedattribute id='lobby-select'><paper-item>"+playerName+"</paper-item></core-select>");
+        $("#main-core-menu").append("<paper-button raised id='confirm-button'>Confirm, ready for game!</paper-button>");
+        $("#confirm-button").click(function(e){
+          confirmLobby();
+        });
+        confirmHeartbeatIntervalID = setInterval(lobbyHeartbeat, 1000);
+      }
+
+      function handleJoin(button, gameroomName, playerName) {
+        // Set button to disabled, add message why
+        button.attr('disabled',true);
+        button.html("Searching for your game...");
+        // Make requests
+        $.getJSON("http://spyfall-backend.spencer-hawkins.com/game_exists/"+gameroomName+"/", function(result) {
+          if (result.result == true) {
+            button.html("Game found! Joining...");
+            $.getJSON("http://spyfall-backend.spencer-hawkins.com/join_game/"+gameroomName+"/"+playerName+"/",function(result) {
+              if (result.success == true) {
+                // go to confirm page
+                confirmPage();
+              } else {
+                button.html("An error occurred! Try again?...");
+                button.attr('disabled',false);
+              }
+            });
+          } else if(result) {
+            button.html("Game not found... Try again?");
+            button.attr('disabled', false);
+          }
+        });
+      }
+
+      function handleCreate(button, gameroomName, playerName) {
+        console.log("handling craete");
+        // Set button to disabled, add message why
+        button.attr('disabled',true);
+        button.html("Creating your game...");
+        // Make requests
+        $.getJSON("http://spyfall-backend.spencer-hawkins.com/new_game/"+gameroomName+"/"+playerName+"/", function(result) {
+          if (result.game_created == gameroomName) {
+            button.html("Game created! Joining...");
+            confirmPage();
+          } else {
+            button.html("An error occurred! Try again?");
+            button.attr('disabled',false);
+          }
+        });
+      }
+
+      function addButtonClickHandlers(buttonType, button) {
+        button.click(function(e){
+          if (button.attr('disabled')) { return; }
+          // Find data
+          playerName = $("#"+buttonType+"-your-name").val();
+          gameroomName = $("#"+buttonType+"-gameroom-name").val();
+          gameroomPasscode = $("#"+buttonType+"-gameroom-passcode").val();
+          // Test if all fields filled
+          if (playerName == "" || gameroomName == ""){
+            button.html("Fields not complete!");
+            return;
+          }
+          if (buttonType == "join") {
+            handleJoin(button, gameroomName, playerName);
+          } else if (buttonType == "create") {
+            handleCreate(button, gameroomName, playerName);
+          }
+        });
+      }
+
+      addButtonClickHandlers("join", $('#join-go-button'));
+      addButtonClickHandlers("create", $('#create-go-button'));
     </script>
   </body>
 </html>

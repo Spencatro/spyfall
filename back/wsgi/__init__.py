@@ -21,6 +21,7 @@ class SpyfallApp(Flask):
         self.route("/list_players_in_game/<game_name>/")(self.list_players_in_game)
         self.route("/remove_player_from_game/<game_name>/<player_name>/")(self.remove_player_from_game)
         self.route("/game_state/<game_name>/")(self.get_game_state)
+        self.route("/player_role/<game_name>/<player_name>/")(self.get_player_role)
 
     def has_no_empty_params(self, rule):
         defaults = rule.defaults if rule.defaults is not None else ()
@@ -110,6 +111,15 @@ class SpyfallApp(Flask):
         db = self.load_db_file()
         state = db['games'][game_name]['state']
         return self.allow_cross(jsonify({'state':state}))
+
+    def get_player_role(self, game_name, player_name):
+        db = self.load_db_file()
+        result = {}
+        result['role'] = db['games'][game_name]['players'][player_name]['role']
+        result['location'] = "Unknown"
+        if result['role'] != "Spy":
+            result['location'] = db['games'][game_name]['map']
+        return self.allow_cross(jsonify(result))
 
     def confirm_player(self, game_name, player_name):
         db = self.load_db_file()

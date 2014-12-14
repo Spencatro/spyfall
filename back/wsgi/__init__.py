@@ -135,7 +135,7 @@ class SpyfallApp(Flask):
             result['not_in_game'] = True
         else:
             self.mongo.db.games.update({'name':game_name, 'players.name':player_name}, {"$pull":{"players":{"name":player_name}}})
-        return self.allow_cross(jsonify({'success':True}))
+        return self.allow_cross(jsonify(result))
 
     def list_players_in_game(self, game_name):
         db = self.load_db_file()

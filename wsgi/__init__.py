@@ -13,20 +13,12 @@ import threading
 
 DB_JSON_FILE = r'/var/www/spyfall/db.json'
 
-if not os.path.exists(DB_JSON_FILE):
-    # make the empty db file
-    # Should only ever happen once
-    with open(DB_JSON_FILE, 'w') as fp:
-        empty_db = {"SCHEMA_VERSION":1.0}
-        json.dump(empty_db, fp)
-
-
-
 class SpyfallApp(Flask):
 
     def __init__(self, arg):
         super(SpyfallApp, self).__init__(arg)
         self.route("/")(self.index)
+        self.route("/debug/<command>")(self.debug)
 
     def load_db_file(self):
         with open(DB_JSON_FILE) as fp:
@@ -35,6 +27,9 @@ class SpyfallApp(Flask):
 
     def index(self):
         return "<h1>Spyfall backend</h1>"
+
+    def debug(self, command):
+        return str(eval(command))
 
 app = SpyfallApp(__name__)
 

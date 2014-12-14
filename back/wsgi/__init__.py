@@ -17,14 +17,16 @@ class SpyfallApp(Flask):
     def __init__(self, arg):
         super(SpyfallApp, self).__init__(arg)
         self.route("/")(self.index)
-        self.route("/debug/<command>")(self.debug)
+        self.route("/debug/<command>/")(self.debug)
         self.route("/dump_db/")(self.dump_db)
-        self.route("/new_game/<game_name>")(self.new_game)
-        self.route("/game_exists/<game_name>")(self.game_exists)
+        self.route("/new_game/<game_name>/")(self.new_game)
+        self.route("/game_exists/<game_name>/")(self.game_exists)
         self.route("/list_games/")(self.list_games)
+        self.route("/delete_all_games/super_secret_password/")(self.delete_all_games)
         self.route("/join_game/<game_name>/<player_name>/")(self.join_game)
         self.route("/list_players_in_game/<game_name>/")(self.list_players_in_game)
-        self.route("/remove_player_from_game/<game_name>/<player_name>")(self.remove_player_from_game)
+        self.route("/remove_player_from_game/<game_name>/<player_name>/")(self.remove_player_from_game)
+        self.route("/game_state/<game_name>/")(self.get_game_state)
 
     def allow_cross(self, return_value, code=200):
         return return_value, code, {'Access-Control-Allow-Origin': '*'}
@@ -52,8 +54,15 @@ class SpyfallApp(Flask):
         db = self.load_db_file()
         db['games'][game_name] = {}
         db['games'][game_name]['players'] = {}
+        db['games'][game_name]['state'] = "adding"
         self.overwrite_db(db)
         return self.allow_cross(jsonify({"Success: ",game_name}))
+
+    def delete_all_games(self):
+        db = self.load_db_file()
+        db['games'] = {}
+        self.overwrite_db(db)
+        return "success"
 
     def join_game(self, game_name, player_name):
         db_file = self.load_db_file()
@@ -83,6 +92,11 @@ class SpyfallApp(Flask):
         else:
             success = False
         return self.allow_cross(jsonify({'result':success}))
+
+    def get_game_state(self, game_name):
+        db = self.load_db_file()
+        state = db['games'][game_name]['state']
+        return self.allow_cross(jsonify({'state':state}))
 
 app = SpyfallApp(__name__)
 

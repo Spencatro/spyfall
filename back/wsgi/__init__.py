@@ -5,8 +5,6 @@ from flask import render_template, abort
 import urllib
 from flask.ext.pymongo import PyMongo
 
-DB_JSON_FILE = r'/var/www/spyfall/back/db.json'
-
 class SpyfallApp(Flask):
 
     def __init__(self, arg):
@@ -54,11 +52,6 @@ class SpyfallApp(Flask):
 
     def allow_cross(self, return_value, code=200):
         return return_value, code, {'Access-Control-Allow-Origin': '*'}
-
-    def overwrite_db(self, new_contents):
-        with open(DB_JSON_FILE, 'w') as wfp:
-            json.dump(new_contents, wfp)
-        return "success"
 
     def map(self):
         output = []
@@ -122,7 +115,7 @@ class SpyfallApp(Flask):
     def join_game(self, game_name, player_name, no_http=False):
         result = {'success':True, 'already_in_game':False}
         if not self.player_is_in_game(game_name, player_name):
-            self.mongo.db.games.update({'name':game_name},{"$push":{'players':{'name':player_name, 'confirmed':False, 'role':"unassigned"}}})
+            self.mongo.db.games.update({'name':game_name},{"$push":{'players':{'name':player_name, 'confirmed':False, 'role':"Player"}}})
         else:
             result['already_in_game'] = True
         if no_http:

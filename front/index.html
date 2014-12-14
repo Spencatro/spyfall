@@ -7,7 +7,7 @@
     <script src="bower_components/webcomponentsjs/webcomponents.js">
     </script>
 
-    <title>Spyfall</title>
+    <title>RadioFreaq</title>
 
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
@@ -136,7 +136,7 @@
 
         function playGame() {
           $("#confirm-button").html("Everyone confirmed! Starting game...");
-          $.getJSON("http://spyfall-backend.spencer-hawkins.com/player_role/"+gameroomName+"/"+playerName+"/", function(result) {
+          $.getJSON("http://b.radiofreaq.spencer-hawkins.com/player_role/"+gameroomName+"/"+playerName+"/", function(result) {
             console.log(result);
             $("#main-core-menu").html("<h1>Your role: "+result.role+"</h1><h1>Location: "+result.location+"</h1>");
           });
@@ -145,7 +145,7 @@
 
         function lobbyConfirmedHeartbeat() {
           console.log("doing post-confirm hb");
-          $.getJSON("http://spyfall-backend.spencer-hawkins.com/game_state/"+gameroomName+"/", function(result) {
+          $.getJSON("http://b.radiofreaq.spencer-hawkins.com/game_state/"+gameroomName+"/", function(result) {
             console.log(result);
             if (result.state == "playing") {
               clearInterval(confirmHeartbeatIntervalID);
@@ -156,7 +156,7 @@
 
         function lobbyHeartbeat() {
           console.log("lhb");
-          $.getJSON("http://spyfall-backend.spencer-hawkins.com/list_players_in_game/"+gameroomName+"/", function(result) {
+          $.getJSON("http://b.radiofreaq.spencer-hawkins.com/list_players_in_game/"+gameroomName+"/", function(result) {
             childs = $("#lobby-select").children();
             child_array = []
             for(var i = 0; i < childs.length; i++) {
@@ -173,7 +173,7 @@
         }
 
         function confirmLobby() {
-          $.getJSON("http://spyfall-backend.spencer-hawkins.com/confirm_player/"+gameroomName+"/"+playerName+"/", function(result){
+          $.getJSON("http://b.radiofreaq.spencer-hawkins.com/confirm_player/"+gameroomName+"/"+playerName+"/", function(result){
             console.log(result);
           });
           clearInterval(confirmHeartbeatIntervalID);
@@ -208,10 +208,10 @@
           button.attr('disabled',true);
           button.html("Searching for your game...");
           // Make requests
-          $.getJSON("http://spyfall-backend.spencer-hawkins.com/game_exists/"+gameroomName+"/", function(result) {
+          $.getJSON("http://b.radiofreaq.spencer-hawkins.com/game_exists/"+gameroomName+"/", function(result) {
             if (result.result == true) {
               button.html("Game found! Joining...");
-              $.getJSON("http://spyfall-backend.spencer-hawkins.com/join_game/"+gameroomName+"/"+playerName+"/",function(result) {
+              $.getJSON("http://b.radiofreaq.spencer-hawkins.com/join_game/"+gameroomName+"/"+playerName+"/",function(result) {
                 if (result.success == true) {
                   // go to confirm page
                   console.log("Calling confirmPage");
@@ -234,7 +234,7 @@
           button.attr('disabled',true);
           button.html("Creating your game...");
           // Make requests
-          $.getJSON("http://spyfall-backend.spencer-hawkins.com/new_game/"+gameroomName+"/"+playerName+"/", function(result) {
+          $.getJSON("http://b.radiofreaq.spencer-hawkins.com/new_game/"+gameroomName+"/"+playerName+"/", function(result) {
             if (result.game_created == gameroomName) {
               button.html("Game created! Joining...");
               confirmPage();

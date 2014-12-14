@@ -121,6 +121,9 @@ class SpyfallApp(Flask):
         for player_key in players.keys():
             if players[player_key]['confirmed'] == False:
                 all_confirmed = False
+        random_player_index = None
+        len_players = None
+        random_player_name = None
         if all_confirmed and True:# db['games'][game_name]['state'] != "playing": # Skip process if game already playing
             # TODO: Always re-rolling, fix this
             # Pick a random map

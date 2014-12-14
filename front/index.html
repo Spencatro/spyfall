@@ -118,7 +118,8 @@
       </core-pages>
     </core-header-panel>
     <script>
-      $.ready(function() {
+      addEventListener('WebComponentsReady', function() {
+        console.log("WebComponentsReady!");
         console.log("ready");
         var joinDisabled = false;
         var tabs = document.querySelector('paper-tabs');

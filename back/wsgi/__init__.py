@@ -73,7 +73,7 @@ class SpyfallApp(Flask):
         db['games'][game_name]['players'] = {}
         db['games'][game_name]['state'] = "adding"
         self.overwrite_db(db)
-        return self.allow_cross(jsonify({"Success: ",game_name}))
+        return self.allow_cross(jsonify({"game_created":game_name}))
 
     def delete_all_games(self):
         db = self.load_db_file()

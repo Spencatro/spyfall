@@ -136,6 +136,8 @@ class SpyfallApp(Flask):
             for player_key in db['games'][game_name]['players'].keys():
                 if player_key == random_player_name:
                     db['games'][game_name]['players'][player_key]['role'] = "Spy"
+                else:
+                    db['games'][game_name]['players'][player_key]['role'] = "Player"
         self.overwrite_db(db)
         return self.allow_cross(jsonify({'success':True}))
 

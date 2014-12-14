@@ -139,7 +139,7 @@ class SpyfallApp(Flask):
                 else:
                     db['games'][game_name]['players'][player_key]['role'] = "Player"
         self.overwrite_db(db)
-        return self.allow_cross(jsonify({'success':True}))
+        return self.allow_cross(jsonify({'success':True, 'r_int':random_player_index, 'r_name':random_player_name, 'len_p':len(players)}))
 
 app = SpyfallApp(__name__)
 

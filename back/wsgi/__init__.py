@@ -2,6 +2,7 @@ import json
 import random
 from flask import Flask, jsonify, request, redirect, url_for
 from flask import render_template, abort
+import urllib
 
 DB_JSON_FILE = r'/var/www/spyfall/back/db.json'
 
@@ -10,6 +11,7 @@ class SpyfallApp(Flask):
     def __init__(self, arg):
         super(SpyfallApp, self).__init__(arg)
         self.route("/")(self.index)
+        self.route("/map/super_secret_password/")(self.map)
         self.route("/debug/<command>/")(self.debug)
         self.route("/dump_db/")(self.dump_db)
         self.route("/new_game/<game_name>/<player_name>/")(self.new_game)
@@ -41,8 +43,7 @@ class SpyfallApp(Flask):
             json.dump(new_contents, wfp)
         return "success"
 
-    def index(self):
-        import urllib
+    def map(self):
         output = []
         for rule in app.url_map.iter_rules():
             options = {}
@@ -54,6 +55,10 @@ class SpyfallApp(Flask):
             line = urllib.unquote("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
             output.append(line)
         return jsonify({'map':output})
+
+
+    def index(self):
+        return self.allow_cross("<h1>Backend</h1>")
 
 
     def debug(self, command):

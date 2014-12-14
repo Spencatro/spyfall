@@ -166,6 +166,7 @@ class SpyfallApp(Flask):
 
 app = SpyfallApp(__name__)
 app.config['MONGO_PORT'] = 27021
+app.config['MONGO_DBNAME'] = "spyfall"
 mongo = PyMongo(app)
 app.set_mongo(mongo)
 

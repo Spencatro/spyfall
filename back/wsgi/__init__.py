@@ -25,12 +25,19 @@ class SpyfallApp(Flask):
         self.route("/remove_player_from_game/<game_name>/<player_name>/")(self.remove_player_from_game)
         self.route("/game_state/<game_name>/")(self.get_game_state)
         self.route("/player_role/<game_name>/<player_name>/")(self.get_player_role)
-        self.route("/mongo_test/")(self.mongo_test)
-
+        self.route("/maptest/")(self.maptest)
         self.mongo = None
 
-    def mongo_test(self):
-        self.mongo.db.maps
+    def maptest(self):
+        return jsonify({'maplist':self.get_map_list()})
+
+    def get_map_list(self):
+        mongo_result = self.mongo.db.maps.find()
+        map_list = []
+        for map in mongo_result:
+            idx = map['idx']
+            map_list[idx] = map['name']
+        return map_list
 
     def set_mongo(self, mongo):
         self.mongo = mongo
@@ -150,7 +157,7 @@ class SpyfallApp(Flask):
         if all_confirmed and db['games'][game_name]['state'] != "playing": # Skip process if game already playing
             # TODO: Always re-rolling, fix this
             # Pick a random map
-            maps = db['maps']
+            maps = self.get_map_list()
             random_map_index = random.randint(0, len(maps)-1)
             map = maps[random_map_index]
             db['games'][game_name]['map'] = map

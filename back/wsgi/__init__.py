@@ -1,14 +1,7 @@
-import os
-# import pygst
 import json
-import threading
-import pprint
+import random
 from flask import Flask, jsonify, request, redirect, url_for
 from flask import render_template, abort
-from flask import request
-import requests
-import time
-import threading
 
 DB_JSON_FILE = r'/var/www/spyfall/back/db.json'
 
@@ -73,6 +66,7 @@ class SpyfallApp(Flask):
         db['games'][game_name] = {}
         db['games'][game_name]['players'] = {}
         db['games'][game_name]['state'] = "adding"
+        db['games'][game_name]['map'] = None
         self.overwrite_db(db)
         return self.allow_cross(jsonify({"game_created":game_name}))
 
@@ -116,6 +110,9 @@ class SpyfallApp(Flask):
         state = db['games'][game_name]['state']
         return self.allow_cross(jsonify({'state':state}))
 
+    def assign_roles(self):
+        pass
+
     def confirm_player(self, game_name, player_name):
         db = self.load_db_file()
         db['games'][game_name]['players'][player_name]['confirmed'] = True
@@ -125,6 +122,10 @@ class SpyfallApp(Flask):
             if players[player_key]['confirmed'] == False:
                 all_confirmed = False
         if all_confirmed:
+            maps = db['maps']
+            random_index = random.randint(0, len(maps)-1)
+            map = maps[random_index]
+            db['games'][game_name]['map'] = map
             db['games'][game_name]['state'] = "playing"
         self.overwrite_db(db)
         return self.allow_cross(jsonify({'success':True}))

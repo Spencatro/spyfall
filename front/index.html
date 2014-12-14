@@ -233,6 +233,7 @@
       }
 
       function addButtonClickHandlers(buttonType, button) {
+        console.log("Adding click handler for"+buttonType);
         button.click(function(e){
           if (button.attr('disabled')) { return; }
           // Find data
@@ -254,6 +255,7 @@
 
       addButtonClickHandlers("join", $('#join-go-button'));
       addButtonClickHandlers("create", $('#create-go-button'));
+      console.log("End of script");
     </script>
   </body>
 </html>

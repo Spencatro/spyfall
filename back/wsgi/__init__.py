@@ -141,7 +141,7 @@ class SpyfallApp(Flask):
         player_list = []
         player_object_list = self.mongo.db.games.find_one({"name":game_name})['players']
         for p_obj in player_object_list:
-            player_list.append(player_object_list['name'])
+            player_list.append(p_obj['name'])
         return self.allow_cross(jsonify({'players':player_list}))
 
     def list_games(self):

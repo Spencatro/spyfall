@@ -121,8 +121,8 @@ class SpyfallApp(Flask):
         db['games'][game_name]['players'][player_name]['confirmed'] = True
         players = db['games'][game_name]['players']
         all_confirmed = True
-        for player in players:
-            if player['confirmed'] == False:
+        for player_key in players.keys():
+            if players[player_key]['confirmed'] == False:
                 all_confirmed = False
         if all_confirmed:
             db['games'][game_name]['state'] = "playing"

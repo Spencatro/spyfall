@@ -121,7 +121,7 @@ class SpyfallApp(Flask):
         for player_key in players.keys():
             if players[player_key]['confirmed'] == False:
                 all_confirmed = False
-        if all_confirmed:
+        if all_confirmed and db['games'][game_name]['state'] != "playing": # Skip process if game already playing
             maps = db['maps']
             random_index = random.randint(0, len(maps)-1)
             map = maps[random_index]

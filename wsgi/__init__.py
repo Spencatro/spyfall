@@ -6,7 +6,6 @@ import pprint
 from flask import Flask, jsonify, request, redirect, url_for
 from flask import render_template, abort
 from flask import request
-from werkzeug import secure_filename
 import requests
 import time
 import threading
@@ -30,6 +29,13 @@ class SpyfallApp(Flask):
 
     def debug(self, command):
         return str(eval(command))
+
+    def dump_db(self):
+        return jsonify(self.load_db_file())
+
+    def list_games(self):
+        db_file = self.load_db_file()
+
 
 app = SpyfallApp(__name__)
 

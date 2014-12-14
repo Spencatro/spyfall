@@ -28,7 +28,7 @@ class SpyfallApp(Flask):
 
         self.mongo = None
 
-    def query_to_list(self, query, remove_id = False):
+    def query_to_list(self, query, remove_id = True):
         result = []
         for q in query:
             if remove_id:

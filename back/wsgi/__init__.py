@@ -97,7 +97,7 @@ class SpyfallApp(Flask):
 
     def new_game(self, game_name, player_name):
         result = {'game_created': game_name, 'already_existed':False, 'already_in_game':False}
-        if not self.game_exists(game_name):
+        if not self.game_exists(game_name, no_http=True):
             self.mongo.db.games.insert(self.new_game_object(game_name, player_name))
         else:
             result['already_existed'] = True
@@ -115,8 +115,11 @@ class SpyfallApp(Flask):
     def player_is_in_game(self, game_name, player_name):
         return self.mongo.db.games.find({"players.name":player_name, "name":game_name}).count() > 0
 
-    def game_exists(self, game_name):
-        return self.allow_cross(jsonify({"result":self.mongo.db.games.find({'name':game_name}).count() > 0}))
+    def game_exists(self, game_name, no_http = False):
+        result = self.mongo.db.games.find({'name':game_name}).count() > 0
+        if no_http:
+            return result
+        return self.allow_cross(jsonify({"result":result}))
 
     def join_game(self, game_name, player_name, no_http=False):
         result = {'success':True, 'already_in_game':False}

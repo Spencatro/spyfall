@@ -18,8 +18,7 @@
     clicked: function(e) {
       poly = this;
       poly.isDisabled = true;
-      poly.innerContent = "Searching for your game...";
-      console.log(this.nameValue);
+      poly.innerContent = "Creating your game...";
       $.getJSON('http://spyfall-backend.spencer-hawkins.com/new_game/'+poly.gameroomNameValue+'/'+poly.nameValue+'/',function(r){
         console.log(r);
       });

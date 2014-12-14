@@ -157,12 +157,13 @@ class SpyfallApp(Flask):
         return self.allow_cross(jsonify({'state':state}))
 
     def get_player_role(self, game_name, player_name):
-        db = self.load_db_file()
         result = {}
-        result['role'] = db['games'][game_name]['players'][player_name]['role']
+        location = self.mongo.db.games.find_one({"name":game_name})['map']
+        role = self.mongo.db.games.find_one({"name":game_name})['players'][player_name]['role']
+        result['role'] = role
         result['location'] = "Unknown"
         if result['role'] != "Spy":
-            result['location'] = db['games'][game_name]['map']
+            result['location'] = location
         return self.allow_cross(jsonify(result))
 
     def confirm_player(self, game_name, player_name):

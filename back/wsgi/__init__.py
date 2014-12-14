@@ -51,7 +51,7 @@ class SpyfallApp(Flask):
         for rule in self.url_map.iter_rules():
         # Filter out rules we can't navigate to in a browser
         # and rules that require parameters
-            if "GET" in rule.methods and self.has_no_empty_params(rule):
+            if "GET" in rule.methods:
                 url = url_for(rule.endpoint)
                 links.append((url, rule.endpoint))
         return jsonify({'map':links})

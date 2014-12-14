@@ -50,7 +50,7 @@ class SpyfallApp(Flask):
 
     def list_games(self):
         db_file = self.load_db_file()
-        return jsonify({'games':db_file['games'].keys()})
+        return jsonify({'games':db_file['games'].keys()}), 200, {'Access-Control-Allow-Origin': '*'}
 
     def game_exists(self, game_name):
         db_file = self.load_db_file()

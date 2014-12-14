@@ -88,7 +88,7 @@
   </head>
 
   <body unresolved>
-    <core-header-panel>
+    <core-header-panel id="main-panel">
       <core-toolbar>
         <paper-tabs id="tabs" selected="0" self-end>
           <paper-tab name="join-game" id="main-tab">Join a game</paper-tab>
@@ -150,7 +150,6 @@
     </core-header-panel>
     <script>
       addEventListener('WebComponentsReady', function() {
-        console.log("WebComponentsReady!");
         console.log("ready");
         var joinDisabled = false;
         var tabs = document.querySelector('paper-tabs');
@@ -162,6 +161,7 @@
 
         tabs.addEventListener('core-select', function() {
           pages.selected = tabs.selected;
+          document.querySelector('#main-panel').scroller.scrollTop = 0;
           console.log("Selected: " + tabs.selected);
         });
 

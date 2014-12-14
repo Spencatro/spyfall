@@ -107,9 +107,7 @@ class SpyfallApp(Flask):
         return self.allow_cross(jsonify(result))
 
     def delete_all_games(self):
-        db = self.load_db_file()
-        db['games'] = {}
-        self.overwrite_db(db)
+        self.mongo.db.games.drop()
         return "success"
 
     def player_is_in_game(self, game_name, player_name):
@@ -132,9 +130,11 @@ class SpyfallApp(Flask):
         return self.allow_cross(jsonify(result))
 
     def remove_player_from_game(self, game_name, player_name):
-        db = self.load_db_file()
-        del db['games'][game_name]['players'][player_name]
-        self.overwrite_db(db)
+        result = {'success':True, 'not_in_game':False}
+        if not self.player_is_in_game(game_name, player_name):
+            result['not_in_game'] = True
+        else:
+            self.mongo.db.games.update({'name':game_name, 'players.name':player_name}, {"$pull":{"players":{"name":player_name}}})
         return self.allow_cross(jsonify({'success':True}))
 
     def list_players_in_game(self, game_name):

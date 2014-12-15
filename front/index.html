@@ -44,6 +44,10 @@
       core-menu {
         margin: 10px;
       }
+      img {
+        width: 100%;
+        max-width: 600px;
+      }
       p {
         font-family: Georgia, "Times New Roman", Times, serif;
       }
@@ -75,6 +79,13 @@
       .container {
         width: 80%;
         margin: 50px auto;
+      }
+      .img-overlay {
+        width: 100%;
+        max-width: 600px;
+        margin-bottom: -60px;
+        background-color: rgba(0,0,0,0.6);
+        margin-top: -8px;
       }
       @media (min-width: 481px) {
         #tabs {
@@ -143,34 +154,8 @@
           <h2>Endgame</h2>
           <p>You may come to find it unlikely during play, but if the timer expires without a unanimous agreement on an accusation, the question asking and answering ends. At this point, discussion of any kind if allowed--you may talk about how people answered certain questions, or who accused who, or anything else. Perhaps you think someone was the spy simply because of the way they were acting! If any unanimous agreement can be reached on an accusation (excluding the vote of the accused, of course), the game ends much like before. <b>You will likely be accused many times during this stage: you are encouraged to defend yourself!</b></p>
           <h2>Locations</h2>
-          <ul><b>Airplane</b></ul>
-          <ul><b>Bank</b></ul>
-          <ul><b>Beach</b></ul>
-          <ul><b>Circus Tent</b></ul>
-          <ul><b>Corporate Party</b></ul>
-          <ul><b>Crusader Army</b></ul>
-          <ul><b>Casino</b></ul>
-          <ul><b>Day Spa</b></ul>
-          <ul><b>Embassy</b></ul>
-          <ul><b>Hospital</b></ul>
-          <ul><b>Hotel</b></ul>
-          <ul><b>Military Base</b></ul>
-          <ul><b>Movie Studio</b></ul>
-          <ul><b>Ocean Liner Ship</b></ul>
-          <ul><b>Passenger Train</b></ul>
-          <ul><b>Pirate Ship</b></ul>
-          <ul><b>Polar Station</b></ul>
-          <ul><b>Police Station</b></ul>
-          <ul><b>High-Dollar Restaurant</b></ul>
-          <ul><b>Dive Bar</b></ul>
-          <ul><b>School</b></ul>
-          <ul><b>Service Station</b></ul>
-          <ul><b>Space Station</b></ul>
-          <ul><b>Submarine</b></ul>
-          <ul><b>Supermarket</b></ul>
-          <ul><b>Opera</b></ul>
-          <ul><b>University</b></ul>
-          <ul><b>Mad Scientist's Laboratory</b></ul>
+          <div id="h2p-location-list">
+          </div>
           <h2>About RadioFreaq</h2>
           <p>RadioFreaq is based off of the game <a href="http://international.hobbyworld.ru/catalog/25-spyfall/">Spyfall</a>. RadioFreaq's code was developed by <a href="http://spencer-hawkins.com">Spencer Hawkins</a>, December 2014.</p>
           <p>&nbsp;<p>
@@ -187,6 +172,7 @@
         var playerName = null;
         var gameroomName = null;
         var confirmHeartbeatIntervalID = null;
+        var locationImages = null;
 
         tabs.addEventListener('core-select', function() {
           pages.selected = tabs.selected;
@@ -203,7 +189,11 @@
           $("#confirm-button").html("Everyone confirmed! Starting game...");
           $.getJSON("http://b.radiofreaq.spencer-hawkins.com/player_role/"+gameroomName+"/"+playerName+"/", function(result) {
             console.log(result);
-            $("#main-core-menu").html("<h1>Your role: "+result.role+"</h1><h1>Location: "+result.location+"</h1>");
+            $("#main-core-menu").html("<h1>Your role: "+result.role+"</h1><h1>Location: "+result.location+"</h1><div id='pg-location-list'></div>");
+            $.each(locationImages, function(k,v){
+              $('#pg-location-list').append("<paper-item class='img-overlay'>"+k+"</paper-item><br /><img src='"+v+"' />");
+            });
+
           });
 
         }
@@ -334,6 +324,12 @@
 
         addButtonClickHandlers("join", $('#join-go-button'));
         addButtonClickHandlers("create", $('#create-go-button'));
+        $.getJSON("http://b.radiofreaq.spencer-hawkins.com/list_location_objects/", function(result) {
+          locationImages = result;
+          $.each(result, function(k,v){
+            $('#h2p-location-list').append("<paper-item class='img-overlay'>"+k+"</paper-item><br /><img src='"+v+"' />");
+          });
+        });
         console.log("End of script");
     });
     </script>

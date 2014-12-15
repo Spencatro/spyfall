@@ -46,7 +46,9 @@ class SpyfallApp(Flask):
     def list_location_objects(self):
         map_dict = {}
         for map_obj in self.mongo.db.maps.find():
-            map_dict[map_obj['name']] = map_obj['img_url']
+            map_dict[map_obj['name']] = None
+            if 'img_url' in map_obj.keys():
+                map_dict[map_obj['name']] = map_obj['img_url']
         return self.allow_cross(jsonify(map_dict))
 
     def set_mongo(self, mongo):

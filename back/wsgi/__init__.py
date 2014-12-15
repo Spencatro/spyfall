@@ -10,19 +10,20 @@ class SpyfallApp(Flask):
     def __init__(self, arg):
         super(SpyfallApp, self).__init__(arg)
         self.route("/")(self.index)
-        self.route("/map/super_secret_password/")(self.map)
-        self.route("/debug/<command>/")(self.debug)
-        self.route("/dump_db/")(self.dump_db)
-        self.route("/new_game/<game_name>/<player_name>/")(self.new_game)
-        self.route("/game_exists/<game_name>/")(self.game_exists)
-        self.route("/list_games/")(self.list_games)
-        self.route("/delete_all_games/super_secret_password/")(self.delete_all_games)
-        self.route("/join_game/<game_name>/<player_name>/")(self.join_game)
         self.route("/confirm_player/<game_name>/<player_name>/")(self.confirm_player)
-        self.route("/list_players_in_game/<game_name>/")(self.list_players_in_game)
-        self.route("/remove_player_from_game/<game_name>/<player_name>/")(self.remove_player_from_game)
+        self.route("/debug/<command>/")(self.debug)
+        self.route("/delete_all_games/super_secret_password/")(self.delete_all_games)
+        self.route("/dump_db/")(self.dump_db)
+        self.route("/game_exists/<game_name>/")(self.game_exists)
         self.route("/game_state/<game_name>/")(self.get_game_state)
+        self.route("/join_game/<game_name>/<player_name>/")(self.join_game)
+        self.route("/list_games/")(self.list_games)
+        self.route("/list_location_objects/")(self.list_location_objects)
+        self.route("/list_players_in_game/<game_name>/")(self.list_players_in_game)
+        self.route("/map/super_secret_password/")(self.map)
+        self.route("/new_game/<game_name>/<player_name>/")(self.new_game)
         self.route("/player_role/<game_name>/<player_name>/")(self.get_player_role)
+        self.route("/remove_player_from_game/<game_name>/<player_name>/")(self.remove_player_from_game)
 
         self.mongo = None
 
@@ -41,6 +42,12 @@ class SpyfallApp(Flask):
         for map in mongo_result:
             map_list.append(map['name'])
         return map_list
+
+    def list_location_objects(self):
+        map_dict = {}
+        for map_obj in self.mongo.db.maps.find():
+            map_dict[map_obj['name']] = map_obj['img_url']
+        return self.allow_cross(jsonify(map_dict))
 
     def set_mongo(self, mongo):
         self.mongo = mongo

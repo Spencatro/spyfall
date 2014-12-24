@@ -25,6 +25,7 @@ class SpyfallApp(Flask):
         self.route("/player_role/<game_name>/<player_name>/")(self.get_player_role)
         self.route("/remove_player_from_game/<game_name>/<player_name>/")(self.remove_player_from_game)
         self.route("/remote_log/<game_name>/<player_name>/<timestamp>/<log_str>")(self.remote_log)
+        self.route("/reset_game/<game_name>/<end_type>/")(self.reset_game)
         self.route("/show_logs/")(self.show_logs)
 
         self.mongo = None
@@ -219,6 +220,23 @@ class SpyfallApp(Flask):
             random_player_name = players[random_player_index]
             self.mongo.db.games.update({"name":game_name},{"$set":{"players."+str(random_player_index)+".role":"Spy"}})
         return self.allow_cross(jsonify({'success':True, 'r_int':random_player_index, 'r_name':random_player_name, 'len_p':len_players}))
+
+    def reset_game(self, game_name, end_type):
+        # Pick a random map
+        maps = self.get_map_list()
+        random_map_index = random.randint(0, len(maps)-1)
+        game_map = maps[random_map_index]
+        self.mongo.db.games.update({"name":game_name}, {"$set":{"map":game_map, "state":"playing"}})
+        # Pick a random spy
+        players = self.list_players_in_game(game_name,no_http=True)
+        len_players = len(players)
+        # Reset all players to "Player"
+        for i in range(len_players):
+            self.mongo.db.games.update({"name":game_name},{"$set":{"players."+str(i)+".role":"Player"}})
+        random_player_index = random.randint(0, len_players-1)
+        random_player_name = players[random_player_index]
+        self.mongo.db.games.update({"name":game_name},{"$set":{"players."+str(random_player_index)+".role":"Spy"}})
+        return self.allow_cross(jsonify({"success":True}))
 
 app = SpyfallApp(__name__)
 app.config['MONGO_PORT'] = 27021

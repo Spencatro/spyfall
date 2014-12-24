@@ -185,7 +185,7 @@
           }
         });
 
-        function log(logStr) {
+        function remoteLog(logStr) {
           logPlayer = "NotAssigned";
           logGame = "NotAssigned";
           if (playerName != null) {
@@ -200,8 +200,6 @@
           });
         }
 
-        log("test!");
-
         function playGame() {
           $("#confirm-button").html("Everyone confirmed! Starting game...");
           $.getJSON("http://b.radiofreaq.spencer-hawkins.com/player_role/"+gameroomName+"/"+playerName+"/", function(result) {
@@ -210,7 +208,6 @@
             $.each(locationImages, function(k,v){
               $('#pg-location-list').append("<paper-item class='img-overlay'>"+k+"</paper-item><br /><img src='"+v+"' />");
             });
-
           });
 
         }
@@ -228,6 +225,7 @@
 
         function lobbyHeartbeat() {
           console.log("lhb");
+          console.log(result);
           $.getJSON("http://b.radiofreaq.spencer-hawkins.com/list_players_in_game/"+gameroomName+"/", function(result) {
             childs = $("#lobby-select").children();
             child_array = []

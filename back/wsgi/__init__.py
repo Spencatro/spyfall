@@ -159,13 +159,13 @@ class SpyfallApp(Flask):
         return jsonify({"logs":self.query_to_list(logs)})
 
     def list_players_in_game(self, game_name, no_http = False):
-        player_list = []
+        player_obj = {}
         player_object_list = self.mongo.db.games.find_one({"name":game_name})['players']
         for p_obj in player_object_list:
-            player_list.append(p_obj['name'])
+            player_obj[p_obj['name']] = p_obj['confirmed']
         if no_http:
-            return player_list
-        return self.allow_cross(jsonify({'players':player_list}))
+            return player_obj
+        return self.allow_cross(jsonify({'players':player_obj}))
 
     def list_games(self):
         game_obj_list = self.query_to_list(self.mongo.db.games.find())

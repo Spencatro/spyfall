@@ -213,6 +213,7 @@
         }
 
         function lobbyConfirmedHeartbeat() {
+          lobbyHeartbeat();
           console.log("doing post-confirm hb");
           $.getJSON("http://b.radiofreaq.spencer-hawkins.com/game_state/"+gameroomName+"/", function(result) {
             console.log(result);
@@ -225,19 +226,27 @@
 
         function lobbyHeartbeat() {
           console.log("lhb");
-          console.log(result);
           $.getJSON("http://b.radiofreaq.spencer-hawkins.com/list_players_in_game/"+gameroomName+"/", function(result) {
+
             childs = $("#lobby-select").children();
-            child_array = []
+            child_dict = {}
             for(var i = 0; i < childs.length; i++) {
-              child_array.push($(childs[i]).html());
+              name = $(childs[i]).html();
+              confirmed = $(childs[i]).attr("confirmed") == "true";
+              console.log(childs[i])
+              child_dict[name] = confirmed;
             }
-            if(!($(child_array).not(result.players).length == 0 && $(result.players).not(child_array).length == 0)) {
+            object_equality = JSON.stringify(child_dict) == JSON.stringify(result['players']);
+            if(!object_equality) {
               console.log("time to update the array");
               $("#lobby-select").html(""); 
-              for(var i = 0; i < result.players.length; i++) {
-                $("#lobby-select").append("<paper-item>"+result.players[i]+"</paper-item>");
-              }
+              $.each(result['players'], function(key, value) {
+                background_color = "#1A1A1A";
+                if (result['players'][key]) {
+                  background_color = "#0E4F00";
+                }
+                $("#lobby-select").append("<paper-item style='background-color:"+background_color+";' confirmed='"+result['players'][key]+"'>"+key+"</paper-item>");
+              });
             }
           });
         }

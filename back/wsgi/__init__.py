@@ -25,6 +25,7 @@ class SpyfallApp(Flask):
         self.route("/player_role/<game_name>/<player_name>/")(self.get_player_role)
         self.route("/remove_player_from_game/<game_name>/<player_name>/")(self.remove_player_from_game)
         self.route("/remote_log/<game_name>/<player_name>/<timestamp>/<log_str>")(self.remote_log)
+        self.route("/show_logs/")(self.show_logs)
 
         self.mongo = None
 
@@ -152,6 +153,10 @@ class SpyfallApp(Flask):
         result = "ok"
         self.mongo.db.logs.insert(self.new_log_object(game_name, player_name, timestamp, log_str));
         return result
+
+    def show_logs(self):
+        logs = self.mongo.db.logs.find()
+        return jsonify({"logs":self.query_to_list(logs)})
 
     def list_players_in_game(self, game_name, no_http = False):
         player_list = []

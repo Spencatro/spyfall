@@ -152,7 +152,7 @@ class SpyfallApp(Flask):
     def remote_log(self, game_name, player_name, timestamp, log_str):
         result = "ok"
         self.mongo.db.logs.insert(self.new_log_object(game_name, player_name, timestamp, log_str));
-        return result
+        return self.allow_cross(result)
 
     def show_logs(self):
         logs = self.mongo.db.logs.find()

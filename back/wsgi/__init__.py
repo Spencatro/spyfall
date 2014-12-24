@@ -241,7 +241,9 @@ class SpyfallApp(Flask):
         random_player_index = random.randint(0, len_players-1)
         random_player_name = players[random_player_index]
         self.mongo.db.games.update({"name":game_name},{"$set":{"players."+str(random_player_index)+".role":"Spy"}})
-        return self.allow_cross(jsonify({"success":True}))
+
+        updated_game_obj = mongo.db.games.find({"name":game_name})
+        return self.allow_cross(jsonify({"success":True, "round":updated_game_obj['round']}))
 
 app = SpyfallApp(__name__)
 app.config['MONGO_PORT'] = 27021

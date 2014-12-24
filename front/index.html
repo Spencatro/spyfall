@@ -185,6 +185,21 @@
           }
         });
 
+        function log(logStr) {
+          logPlayer = "NotAssigned";
+          logGame = "NotAssigned";
+          if (playerName != null) {
+            logPlayer = playerName;
+          }
+          if (gameroomName != null) {
+            logGame = gameroomName;
+          }
+          logUrl = "http://b.radiofreaq.spencer-hawkins.com/remote_log/"+logGame+"/"+logPlayer+"/"+$.now()+"/"+logStr
+          $.getJSON(logUrl, function(result) {
+            console.log(result + ":" + logUrl);
+          });
+        }
+
         function playGame() {
           $("#confirm-button").html("Everyone confirmed! Starting game...");
           $.getJSON("http://b.radiofreaq.spencer-hawkins.com/player_role/"+gameroomName+"/"+playerName+"/", function(result) {

@@ -24,6 +24,7 @@ class SpyfallApp(Flask):
         self.route("/new_game/<game_name>/<player_name>/")(self.new_game)
         self.route("/player_role/<game_name>/<player_name>/")(self.get_player_role)
         self.route("/remove_player_from_game/<game_name>/<player_name>/")(self.remove_player_from_game)
+        self.route("/remote_log/<game_name>/<player_name>/<timestamp>/<log_str>")(self.remote_log)
 
         self.mongo = None
 
@@ -97,6 +98,14 @@ class SpyfallApp(Flask):
         d['map'] = None
         return d
 
+    def new_log_object(self, game_name, player_name, timestamp, log_str):
+        d = {}
+        d['game_name'] = game_name
+        d['player_name'] = player_name
+        d['log'] = log_str
+        d['timestamp'] = timestamp
+        return d
+
     def new_game(self, game_name, player_name):
         result = {'game_created': game_name, 'already_existed':False, 'already_in_game':False}
         if not self.game_exists(game_name, no_http=True):
@@ -138,6 +147,11 @@ class SpyfallApp(Flask):
         else:
             self.mongo.db.games.update({'name':game_name, 'players.name':player_name}, {"$pull":{"players":{"name":player_name}}})
         return self.allow_cross(jsonify(result))
+
+    def remote_log(self, game_name, player_name, timestamp, log_str):
+        result = "ok"
+        self.mongo.db.logs.insert(self.new_log_object(game_name, player_name, timestamp, log_str));
+        return result
 
     def list_players_in_game(self, game_name, no_http = False):
         player_list = []

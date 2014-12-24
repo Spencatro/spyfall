@@ -228,8 +228,10 @@ class SpyfallApp(Flask):
         maps = self.get_map_list()
         random_map_index = random.randint(0, len(maps)-1)
         game_map = maps[random_map_index]
-        # ------------------------------------------------------v set map    ---v set state ----------v increment round counter
-        self.mongo.db.games.update({"name":game_name}, {"$set":{"map":game_map, "state":"playing"}}, {"$inc":{"round":1}})
+        # ------------------------------------------------------v set map    ---v set state
+        self.mongo.db.games.update({"name":game_name}, {"$set":{"map":game_map, "state":"playing"}})
+        # update round
+        self.mongo.db.games.update({"name":game_name}, {"$inc":{"round":1}})
         # Pick a random spy
         players = self.list_players_in_game(game_name,no_http=True)
         len_players = len(players)

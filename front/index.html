@@ -258,6 +258,7 @@
 
         function lobbyHeartbeat() {
           console.log("lhb");
+          console.log("You are: "+playerName)
           $.getJSON("http://b.radiofreaq.spencer-hawkins.com/list_players_in_game/"+gameroomName+"/", function(result) {
 
             childs = $("#lobby-select").children();
@@ -360,9 +361,10 @@
           button.click(function(e){
             if (button.attr('disabled')) { return; }
             // Find data
-            playerName = $("#"+buttonType+"-your-name").val();
-            gameroomName = $("#"+buttonType+"-gameroom-name").val();
-            gameroomPasscode = $("#"+buttonType+"-gameroom-passcode").val();
+            playerName = $("#"+buttonType+"-your-name").val().toLowerCase();
+            playerName = playerName.charAt(0).toUpperCase()+playerName.slice(1);
+            gameroomName = $("#"+buttonType+"-gameroom-name").val().toLowerCase();
+            gameroomPasscode = $("#"+buttonType+"-gameroom-passcode").val().toLowerCase();
             // Test if all fields filled
             if (playerName == "" || gameroomName == ""){
               button.html("Fields not complete!");

@@ -195,7 +195,7 @@ class SpyfallApp(Flask):
         return self.allow_cross(jsonify(result))
 
     def confirm_player(self, game_name, player_name):
-        player_list = self.list_players_in_game(game_name, no_http=True)
+        player_list = [key for key in self.list_players_in_game(game_name, no_http=True).keys()]
         player_index = player_list.index(player_name)
         self.mongo.db.games.update({"name":game_name}, {"$set":{"players."+str(player_index)+".confirmed":True}})
         players = self.mongo.db.games.find_one({"name":game_name})['players']

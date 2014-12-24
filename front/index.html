@@ -200,6 +200,8 @@
           });
         }
 
+        log("test!");
+
         function playGame() {
           $("#confirm-button").html("Everyone confirmed! Starting game...");
           $.getJSON("http://b.radiofreaq.spencer-hawkins.com/player_role/"+gameroomName+"/"+playerName+"/", function(result) {

@@ -98,6 +98,8 @@ class SpyfallApp(Flask):
         d['players'] = []
         d['state'] = "adding"
         d['map'] = None
+        d['round'] = 1
+        d['results'] = {}
         return d
 
     def new_log_object(self, game_name, player_name, timestamp, log_str):
@@ -226,7 +228,8 @@ class SpyfallApp(Flask):
         maps = self.get_map_list()
         random_map_index = random.randint(0, len(maps)-1)
         game_map = maps[random_map_index]
-        self.mongo.db.games.update({"name":game_name}, {"$set":{"map":game_map, "state":"playing"}})
+        # ------------------------------------------------------v set map    ---v set state ----------v increment round counter
+        self.mongo.db.games.update({"name":game_name}, {"$set":{"map":game_map, "state":"playing"}}, {"$inc":{"round":1}})
         # Pick a random spy
         players = self.list_players_in_game(game_name,no_http=True)
         len_players = len(players)

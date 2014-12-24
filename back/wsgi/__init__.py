@@ -164,7 +164,7 @@ class SpyfallApp(Flask):
         for p_obj in player_object_list:
             player_obj[p_obj['name']] = p_obj['confirmed']
         if no_http:
-            return player_obj
+            return [key for key in player_obj.keys()]
         return self.allow_cross(jsonify({'players':player_obj}))
 
     def list_games(self):
@@ -195,7 +195,7 @@ class SpyfallApp(Flask):
         return self.allow_cross(jsonify(result))
 
     def confirm_player(self, game_name, player_name):
-        player_list = [key for key in self.list_players_in_game(game_name, no_http=True).keys()]
+        player_list = self.list_players_in_game(game_name, no_http=True)
         player_index = player_list.index(player_name)
         self.mongo.db.games.update({"name":game_name}, {"$set":{"players."+str(player_index)+".confirmed":True}})
         players = self.mongo.db.games.find_one({"name":game_name})['players']

@@ -76,6 +76,9 @@
         margin: 10px;
         display: none;
       }
+      #reload-game-button {
+        margin-bottom: 15px;
+      }
       .container {
         width: 80%;
         margin: 50px auto;
@@ -200,13 +203,42 @@
           });
         }
 
+        function resetGame() {
+          $("#reset-game-button").attr("disabled",true);
+          $("#reset-game-button").html("Resetting game! ...");
+          $.getJSON("http://b.radiofreaq.spencer-hawkins.com/reset_game/"+gameroomName+"/simpleend/", function(result) {
+            reloadGame();
+            $("#reset-game-button").attr("disabled",false);
+            $("#reset-game-button").html("Success! Tell others to refresh page and ensure round count is "+result.round+". New game again?");
+          });
+        }
+
+        function reloadGame() {
+          $("#reload-game-button").attr("disabled",true);
+          $("#reload-game-button").html("Reloading...");
+          $.getJSON("http://b.radiofreaq.spencer-hawkins.com/player_role/"+gameroomName+"/"+playerName+"/", function(result) {
+            $("#current_game_location").html(result.location);
+            $("#current_game_role").html(result.role);
+            $("#current_game_round").html(result.round);
+            $("#reload-game-button").html("Reload game data");
+            $("#reload-game-button").attr("disabled",false);
+          });
+        }
+
         function playGame() {
           $("#confirm-button").html("Everyone confirmed! Starting game...");
           $.getJSON("http://b.radiofreaq.spencer-hawkins.com/player_role/"+gameroomName+"/"+playerName+"/", function(result) {
             console.log(result);
-            $("#main-core-menu").html("<h1>Your role: "+result.role+"</h1><h1>Location: "+result.location+"</h1><div id='pg-location-list'></div>");
+            $("#main-core-menu").html("<h1>Hello, comrade "+playerName+"</h1><h2>Game round: <span id='current_game_round'>1</span></h2><h2>Your role: <span id='current_game_role'>"+result.role+"</span></h2><h2>Location: <span id='current_game_location'>"+result.location+"</span></h2><paper-button raised id='reload-game-button'>Reload game data</paper-button><div id='pg-location-list'></div><paper-button raised id='reset-game-button'>Start a new game!</paper-button>");
             $.each(locationImages, function(k,v){
               $('#pg-location-list').append("<paper-item class='img-overlay'>"+k+"</paper-item><br /><img src='"+v+"' />");
+            });
+            // Add listener for reload and reset
+            $("#reset-game-button").click(function(e){
+              resetGame();
+            });
+            $("#reload-game-button").click(function(e){
+              reloadGame();
             });
           });
 
@@ -275,7 +307,6 @@
           $("#main-core-menu").append("<paper-button raised id='confirm-button'>Confirm, ready for game!</paper-button>");
           console.log("called 2nd append");
           $("#confirm-button").click(function(e){
-
             confirmLobby();
           });
           confirmHeartbeatIntervalID = setInterval(lobbyHeartbeat, 1000);

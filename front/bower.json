@@ -19,6 +19,9 @@
     "paper-ripple": "Polymer/paper-ripple#~0.5.2",
     "core-menu": "Polymer/core-menu#~0.5.2",
     "core-list": "Polymer/core-list#~0.5.2",
-    "core-selection": "Polymer/core-selection#~0.5.2"
+    "core-selection": "Polymer/core-selection#~0.5.2",
+    "core-overlay": "polymer/core-overlay#~0.5.2",
+    "paper-radio-button": "polymer/paper-radio-button#~0.5.2",
+    "paper-radio-group": "polymer/paper-radio-group#~0.5.2"
   }
 }

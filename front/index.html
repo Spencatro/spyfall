@@ -6,7 +6,7 @@
     <script src="bower_components/webcomponentsjs/webcomponents.js">
     </script>
     <script>
-      underConstruction = true;
+      underConstruction = false;
       if(underConstruction) {
         alert("Warning: Site is currently under construction! Some parts of the site may behave erratically, or simply not work at all!\nContact hawkins.spencer@gmail.com for more information.");
       }
@@ -20,12 +20,17 @@
     <link rel="import" href="bower_components/core-toolbar/core-toolbar.html">
     <link rel="import" href="bower_components/core-menu/core-menu.html">
     <link rel="import" href="bower_components/core-item/core-item.html">
+    <link rel="import" href="bower_components/core-overlay/core-overlay.html">
+    <link rel="import" href="bower_components/core-transition/core-transition-css.html">
+    <link rel="import" href="bower_components/core-collapse/core-collapse.html">
     <link rel="import" href="bower_components/core-selection/core-selection.html">
     <link rel="import" href="bower_components/core-pages/core-pages.html">
     <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
     <link rel="import" href="bower_components/paper-input/paper-input.html">
     <link rel="import" href="bower_components/paper-item/paper-item.html">
     <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="bower_components/paper-radio-button/paper-radio-button.html">
+    <link rel="import" href="bower_components/paper-radio-group/paper-radio-group.html">
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
@@ -50,8 +55,10 @@
         margin: 10px;
       }
       img {
-        width: 80%;
-        max-width: 600px;
+        width: 100%;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
       }
       p {
         font-family: Georgia, "Times New Roman", Times, serif;
@@ -84,16 +91,30 @@
       #reload-game-button {
         margin-bottom: 15px;
       }
+      .centered-image {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+      }
       .container {
         width: 80%;
         margin: 50px auto;
       }
       .img-overlay {
-        width: 80%;
-        max-width: 600px;
+        width: 100%;
+        max-width: 800px;
         margin-bottom: -60px;
         background-color: rgba(0,0,0,0.6);
         margin-top: -8px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .collapse-header {
+        margin-left: auto;
+        margin-right: auto;
+        background-color: #444;
+        border-radius: 5px;
+        padding: 10px;
       }
       @media (min-width: 481px) {
         #tabs {
@@ -107,6 +128,113 @@
   </head>
 
   <body unresolved>
+
+  <!-- a simple dialog element made with core-overlay -->
+  <polymer-element name="x-dialog" attributes="opened autoCloseDisabled">
+  <template>
+    <style>
+      :host {
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 13px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        overflow: hidden;
+        background: white;
+        padding:30px 42px;
+        outline: 1px solid rgba(0,0,0,0.2);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      }
+    </style>
+    <core-overlay id="overlay" layered backdrop opened="{{opened}}" autoCloseDisabled="{{autoCloseDisabled}}"  transition="core-transition-center"></core-overlay>
+    <content></content>
+  </template>
+  <script>
+  Polymer('x-dialog', {
+  
+    ready: function() {
+      this.$.overlay.target = this;
+    },
+    toggle: function() {
+      this.$.overlay.toggle();
+    }
+  });
+  </script>
+  </polymer-element>
+
+
+  <!-- an element that uses the x-dialog element and core-overlay -->
+  <polymer-element name="end-game-button" attributes="quit label disabled">
+  <template>
+    <x-dialog id="dialog" class="dialog">
+      <!-- place all overlay styles inside the overlay target -->
+      <style no-shim>
+        .dialog {
+          color: black;
+          box-sizing: border-box;
+          -moz-box-sizing: border-box;
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 13px;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          overflow: hidden;
+          background: white;
+          padding:30px 42px;
+          outline: 1px solid rgba(0,0,0,0.2);
+          box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+        paper-button {
+          background-color: #444;
+        }
+        #dialog {
+          width: 500px;
+          max-width: 70%;
+        }
+      </style>
+      <h2>Who won?</h2>
+      <div>Select a winner from the players below, or leave blank for a draw.</div>
+        <paper-radio-group id="winSelect">
+        </paper-radio-group>
+      <br><br>
+      <button core-overlay-toggle on-tap="{{okPressed}}">OK</button>
+    </x-dialog>
+
+    <paper-button raised disabled={{disabled}} on-tap="{{tapHandler}}">{{label}}</button>
+  </template>
+  <script>
+  
+  Polymer('end-game-button', {
+  
+    tapHandler: function() {
+      var radioGroup = this.$.winSelect;
+      var dialog = this.$.dialog;
+      $.getJSON("http://b.radiofreaq.spencer-hawkins.com/list_players_in_game/"+gameroomName+"/", function(result) {
+        $(radioGroup).html("");
+        $.each(result['players'], function(key, value) {
+          $(radioGroup).append("<paper-radio-button name='"+key+"' label='"+key+"''></paper-radio-button> <br />");
+        });
+        dialog.toggle();
+      });
+
+    },
+
+    okPressed: function() {
+      selected = $(this.$.winSelect.selection).attr("name");
+      console.log("Processing win for"+selected);
+      if(this.quit == "true") {
+        console.log("Ending game");
+      } else {
+        console.log("Starting a new game");
+        resetGame();
+      }
+    }
+  
+  });
+  
+  </script>
+  </polymer-element>
+
     <core-header-panel id="main-panel">
       <core-toolbar>
         <paper-tabs id="tabs" selected="0" self-end>
@@ -141,28 +269,48 @@
         </div>
         <div name="how-to-play" id="how-to-play">
           <h1>Notice to all operators: beware of RadioFreaqs!</h1>
-          <img src="http://radiofreaq.spencer-hawkins.com/img/shh.jpg" />
+          <img class="centered-image" src="http://radiofreaq.spencer-hawkins.com/img/shh.jpg" />
           <p><i>Comrades!</i> Be wary, for spies are rampant throughout the republic! Exercise caution when communicating with other comrades; if any spies were to determine our TOP SECRET LOCATION or our TOP SECRET PLANS, <i>all will be lost!</i></p>
-          <h2>How to play</h2>
-          <p>RadioFreaq is a simple social-deduction party game where players attempt to either catch the liar, or not get caught in their lies. <b>Note that all players need to be in the same physical location to play RadioFreaq, just like a normal board game.</b></p>
-          <p>The game is simple: if you're a spy, you want to find out what the TOP SECRET location is without being caught. If you're not the spy, you want to catch the Spy before he accomplishes his goal.</p>
-          <h2>Rules</h2>
-          <ul>RadioFreaq is a game for 5-10 players.</ul>
-          <ul>In each game of RadioFreaq, there will be one spy. All other players are normal players.</ul>
-          <ul>All players are assigned to the same randomly chosen SECRET location. For example, in a game, all players will be assigned to the "Airplane." The Spy will not know what the SECRET location is, but all other players will.</ul>
-          <ul>At the beginning of each game, select a random person to be the initial communicator.</ul>
-          <ul>The communicator must ask any other player a question. For example, the communicator may ask: "What's the weather like out there, Comrade?". The person who is asked must then answer the question, but beware! The answerer must attempt to be vague enough to not alert the Spy of the SECRET LOCATION, but must be specific enough that other players will not suspect you of being the spy. If you're the spy and you're asked a question, you must try to blend in!</ul>
-          <ul>After answering, the answerer becomes the communicator, and must ask someone else a question. Communicators may not ask a question of the person who had just asked them a question!</ul>
-          <ul>Gameplay continues in this fashion for 8 minutes. Set a timer!</ul>
-          <ul>Once per game, at any point, any player may STOP the game and accuse another player of being the spy. When this happens, no discussion is allowed, and all players (except the accused) must vote on if they think the accused is the spy. <b>The accused is not allowed to speak during this process!</b> If the vote is unanimous--ALL players agree that the accused is the spy--the game ends. If the players correctly identified the spy, the spy loses and the other players win. If the players unanimously mis-identified the spy, the spy wins!</ul>
-          <ul>If there vote is not unanimous, then gameplay continues.</ul>
-          <ul><b>If you are the spy, you should also attempt to accuse another player of being a spy, even though you know they cannot be!</b> If you never accuse another player, it may be obvious that you are the spy.</ul>
-          <ul>Furthermore, if at any point the spy believes he has discovered the SECRET LOCATION, he may end the game by declaring himself the spy, and declaring his guess of the SECRET LOCATION. If the spy is correct, he wins! If he is incorrect, he loses, as he was identified without determining the SECRET LOCATION!</ul>
-          <ul><b>If you are accused of being the Spy, you may NOT counter with an attempt to determine the SECRET LOCATION until the voting process has ended!</b> You must CLEARLY declare your intent during any neutral period of the game, NOT during accusations.</ul>
-          <h2>Endgame</h2>
-          <p>You may come to find it unlikely during play, but if the timer expires without a unanimous agreement on an accusation, the question asking and answering ends. At this point, discussion of any kind if allowed--you may talk about how people answered certain questions, or who accused who, or anything else. Perhaps you think someone was the spy simply because of the way they were acting! If any unanimous agreement can be reached on an accusation (excluding the vote of the accused, of course), the game ends much like before. <b>You will likely be accused many times during this stage: you are encouraged to defend yourself!</b></p>
-          <h2>Locations</h2>
-          <div id="h2p-location-list">
+
+          <div>
+            <h2 class="collapse-header" onclick="document.querySelector('#h2p-collapse').toggle();">How To Play</h2>
+            <core-collapse id="h2p-collapse">
+              <p>RadioFreaq is a simple social-deduction party game where players attempt to either catch the liar, or not get caught in their lies. <b>Note that all players need to be in the same physical location to play RadioFreaq, just like a normal board game.</b></p>
+              <p>The game is simple: if you're a spy, you want to find out what the TOP SECRET location is without being caught. If you're not the spy, you want to catch the Spy before he accomplishes his goal.</p>
+            </core-collapse>
+          </div>
+
+          <div>
+            <h2 class="collapse-header" onclick="document.querySelector('#rules-collapse').toggle();">Rules</h2>
+            <core-collapse id="rules-collapse">
+              <ul>RadioFreaq is a game for 5-10 players.</ul>
+              <ul>In each game of RadioFreaq, there will be one spy. All other players are normal players.</ul>
+              <ul>All players are assigned to the same randomly chosen SECRET location. For example, in a game, all players will be assigned to the "Airplane." The Spy will not know what the SECRET location is, but all other players will.</ul>
+              <ul>At the beginning of each game, select a random person to be the initial communicator.</ul>
+              <ul>The communicator must ask any other player a question. For example, the communicator may ask: "What's the weather like out there, Comrade?". The person who is asked must then answer the question, but beware! The answerer must attempt to be vague enough to not alert the Spy of the SECRET LOCATION, but must be specific enough that other players will not suspect you of being the spy. If you're the spy and you're asked a question, you must try to blend in!</ul>
+              <ul>After answering, the answerer becomes the communicator, and must ask someone else a question. Communicators may not ask a question of the person who had just asked them a question!</ul>
+              <ul>Gameplay continues in this fashion for 8 minutes. Set a timer!</ul>
+              <ul>Once per game, at any point, any player may STOP the game and accuse another player of being the spy. When this happens, no discussion is allowed, and all players (except the accused) must vote on if they think the accused is the spy. <b>The accused is not allowed to speak during this process!</b> If the vote is unanimous--ALL players agree that the accused is the spy--the game ends. If the players correctly identified the spy, the spy loses and the other players win. If the players unanimously mis-identified the spy, the spy wins!</ul>
+              <ul>If there vote is not unanimous, then gameplay continues.</ul>
+              <ul><b>If you are the spy, you should also attempt to accuse another player of being a spy, even though you know they cannot be!</b> If you never accuse another player, it may be obvious that you are the spy.</ul>
+              <ul>Furthermore, if at any point the spy believes he has discovered the SECRET LOCATION, he may end the game by declaring himself the spy, and declaring his guess of the SECRET LOCATION. If the spy is correct, he wins! If he is incorrect, he loses, as he was identified without determining the SECRET LOCATION!</ul>
+              <ul><b>If you are accused of being the Spy, you may NOT counter with an attempt to determine the SECRET LOCATION until the voting process has ended!</b> You must CLEARLY declare your intent during any neutral period of the game, NOT during accusations.</ul>
+            </core-collapse>
+          </div>
+
+          <div>
+            <h2 class="collapse-header" onclick="document.querySelector('#endgame-collapse').toggle();">Endgame</h2>
+            <core-collapse id="endgame-collapse">
+             <p>You may come to find it unlikely during play, but if the timer expires without a unanimous agreement on an accusation, the question asking and answering ends. At this point, discussion of any kind if allowed--you may talk about how people answered certain questions, or who accused who, or anything else. Perhaps you think someone was the spy simply because of the way they were acting! If any unanimous agreement can be reached on an accusation (excluding the vote of the accused, of course), the game ends much like before. <b>You will likely be accused many times during this stage: you are encouraged to defend yourself!</b></p>
+            </core-collapse>
+          </div>
+
+          <div>
+            <h2 class="collapse-header" onclick="document.querySelector('#location-collapse').toggle();">Locations</h2>
+            <core-collapse id="location-collapse">
+              <div id="h2p-location-list">
+              </div>
+            </core-collapse>
           </div>
           <h2>About RadioFreaq</h2>
           <p>RadioFreaq is based off of the game <a href="http://international.hobbyworld.ru/catalog/25-spyfall/">Spyfall</a>. RadioFreaq's code was developed by <a href="http://spencer-hawkins.com">Spencer Hawkins</a>, December 2014.</p>
@@ -173,14 +321,14 @@
     <script>
       addEventListener('WebComponentsReady', function() {
         console.log("ready");
-        var joinDisabled = false;
-        var tabs = document.querySelector('paper-tabs');
-        var pages = document.querySelector('core-pages');
-        var goButton = document.querySelector('#go-button');
-        var playerName = null;
-        var gameroomName = null;
-        var confirmHeartbeatIntervalID = null;
-        var locationImages = null;
+        joinDisabled = false;
+        tabs = document.querySelector('paper-tabs');
+        pages = document.querySelector('core-pages');
+        goButton = document.querySelector('#go-button');
+        playerName = null;
+        gameroomName = null;
+        confirmHeartbeatIntervalID = null;
+        locationImages = null;
 
         tabs.addEventListener('core-select', function() {
           pages.selected = tabs.selected;
@@ -208,13 +356,13 @@
           });
         }
 
-        function resetGame() {
-          $("#reset-game-button").attr("disabled",true);
-          $("#reset-game-button").html("Resetting game! ...");
+        resetGame = function() {
+          $("#new-game").attr("disabled",true);
+          $("#new-game").attr("label","Resetting game! ...");
           $.getJSON("http://b.radiofreaq.spencer-hawkins.com/reset_game/"+gameroomName+"/simpleend/", function(result) {
             reloadGame();
-            $("#reset-game-button").attr("disabled",false);
-            $("#reset-game-button").html("Success! Tell others to refresh page and ensure round count is "+result.round+". New game again?");
+            $("#new-game").attr("disabled",false);
+            $("#new-game").attr("label","Success! Tell others to refresh page and ensure 'game round' is "+result.round+". New game again?");
           });
         }
 
@@ -230,11 +378,20 @@
           });
         }
 
+        function createToggleHTML(idText, headerText, bodyText, isOpenDefault) {
+          if(typeof(isOpenDefault)==='undefined') isOpenDefault = false;
+          toggleHTML = '<div>\
+            <h2 class="collapse-header" onclick="document.querySelector(\'#'+idText+'\').toggle();">'+headerText+'</h2>\
+            <core-collapse '+(isOpenDefault ? 'opened' : '')+' id="'+idText+'">'+bodyText+'</core-collapse>\
+            </div>';
+            return toggleHTML;
+        }
+
         function playGame() {
           $("#confirm-button").html("Everyone confirmed! Starting game...");
           $.getJSON("http://b.radiofreaq.spencer-hawkins.com/player_role/"+gameroomName+"/"+playerName+"/", function(result) {
             console.log(result);
-            $("#main-core-menu").html("<h1>Hello, comrade "+playerName+"</h1><h2>Game round: <span id='current_game_round'>1</span></h2><h2>Your role: <span id='current_game_role'>"+result.role+"</span></h2><h2>Location: <span id='current_game_location'>"+result.location+"</span></h2><paper-button raised id='reload-game-button'>Reload game data</paper-button><div id='pg-location-list'></div><paper-button raised id='reset-game-button'>Start a new game!</paper-button>");
+            $("#main-core-menu").html("<h1>Hello, comrade "+playerName+"</h1>"+createToggleHTML("game-info","Game Info", "<h2>Game round: <span id='current_game_round'>1</span></h2><h2>Your role: <span id='current_game_role'>"+result.role+"</span></h2><h2>Location: <span id='current_game_location'>"+result.location+"</span></h2><paper-button raised id='reload-game-button'>Reload game data</paper-button>", true)+createToggleHTML("in-game-locations","Locations","<div id='pg-location-list'>")+"</div><end-game-button id='new-game' quit='false' label='Start a New Game'></end-game-button><end-game-button id='end-game' quit='true' label='End Game and Quit'></end-game-button>");
             $.each(locationImages, function(k,v){
               $('#pg-location-list').append("<paper-item class='img-overlay'>"+k+"</paper-item><br /><img src='"+v+"' />");
             });
@@ -244,6 +401,9 @@
             });
             $("#reload-game-button").click(function(e){
               reloadGame();
+            });
+            $("#end-game-button").click(function(e){
+              endGame();
             });
           });
 
